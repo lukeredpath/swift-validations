@@ -1,5 +1,6 @@
 import XCTest
 import Validated
+
 @testable import Validations
 
 final class ValidatorOfTests: XCTestCase {

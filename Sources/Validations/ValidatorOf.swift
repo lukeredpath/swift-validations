@@ -19,7 +19,7 @@ extension Validated {
 }
 
 public struct ValidatorOf<Value, Error> {
-    let validate: (Value) -> Validated<Value, Error>
+    public let validate: (Value) -> Validated<Value, Error>
     
     public func pullback<LocalValue>(_ transform: @escaping (LocalValue) -> Value) -> ValidatorOf<LocalValue, Error> {
         return ValidatorOf<LocalValue, Error> { localValue in
