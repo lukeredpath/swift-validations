@@ -32,3 +32,72 @@ XCTAssertFalse(alwaysFails.validate(1).isValid)
 XCTAssertEquals("failed", alwaysFails.validate(1).errors?.last)
 ```
 
+### Re-using existing validators
+
+Validators be extended and re-used with other types by using the `pullback` function. For example, given we already have a `greaterThan` validator that works on `Int`:
+
+```swift
+func greaterThan(_ lowerBound: Int) -> ValidatorOf<Int, String> {
+    return ValidatorOf<Int, String> { value in 
+        if value > lowerBound {
+            return .valid(value)
+        }
+        return .error("is not greater than \(lowerBound)")
+    }
+}
+```
+
+If we wanted to write a similar validator for the length of a string, we could write one from scratch:
+
+```swift
+func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return ValidatorOf<Int, String> { value in 
+    if value.count > lowerBound {
+            return .valid(value)
+        }
+        return .error("length is not greater than \(lowerBound)")
+    }
+}
+```
+
+However, we are effectively duplicating the logic of the `greaterThan` validator - the only thing that changes is how we obtain the value to compare against (`value.count` instead of `value`) and the error message is prefixed with "length ".
+
+We can remove the logic duplication by pulling back the `greaterThan` validator to operate on the `value`'s `count`:
+
+```swift
+func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return ValidatorOf<Int, String>.pullback { $0.count }
+}
+```
+
+As of Swift 5.2, we can shorten this further due to support for passing a keypath as a function parameter:
+
+```swift
+func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return ValidatorOf<Int, String>.pullback(\.count)
+}
+```
+
+Finally, we can improve the error message to add back the "length " prefix by using `mapError`:
+
+```swift
+func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return ValidatorOf<Int, String>
+      .pullback(\.count)
+      .mapError { "length \($0)" }
+}
+```
+
+### Combining validators
+
+Higher-level validators can be formed from existing ones using the `.combine` static method, so long as the operate on the same value type:
+
+```swift
+let lowerAgeLimit = ValidatorOf<Int, String>.greaterThan(10)
+let upperAgeLimit = ValidatorOf<Int, String>.lessThan(20)
+let ageValidator = ValidatorOf<Int, String>.combine(lowerAgeLimit, upperAgeLimit)
+
+XCTAssert(ageValidator.validate(12).isValid)
+XCTAssertFalse(ageValidator.validate(9).isValid)
+XCTAssertFalse(ageValidator.validate(21).isValid)
+```
