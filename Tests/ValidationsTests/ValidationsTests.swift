@@ -8,8 +8,8 @@ final class ValidationsTests: XCTestCase {
         // results.
         XCTAssertEqual(Validations().text, "Hello, World!")
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+    
+    func testFailing() {
+        XCTAssert(false, "This should fail")
+    }
 }
