@@ -12,10 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: |
-        gem install xcpretty
     - name: Build
       run: make build
     - name: Run tests
-      run: make test
+      run: swift test
