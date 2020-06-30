@@ -21,7 +21,6 @@ final class ValidatorOfTests: XCTestCase {
             numberValidator.validate(3).errors?.first)
     }
     
-    
     func testPullback() {
         let numberValidator = ValidatorOf<Int, String> { value in
             if value > 5 {
