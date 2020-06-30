@@ -1,4 +1,4 @@
-import Validated
+@_exported import Validated
 
 @dynamicMemberLookup
 public struct Validating<Value> {
