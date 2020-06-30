@@ -12,7 +12,7 @@ let package = Package(
             targets: ["Validations"]),
     ],
     dependencies: [
-        .package(name: "Validated", url: "git@github.com:pointfreeco/swift-validated.git", from: "0.2.1"),
+        .package(name: "Validated", url: "https://github.com/pointfreeco/swift-validated.git", from: "0.2.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
