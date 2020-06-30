@@ -4,7 +4,7 @@ import Validated
 
 final class ValidatorOfTests: XCTestCase {
     func testBasicValidator() {
-        let numberValidator = ValidatorOf<Int> { value in
+        let numberValidator = ValidatorOf<Int, String> { value in
             if value > 5 {
                 return .valid(value)
             }
@@ -22,14 +22,14 @@ final class ValidatorOfTests: XCTestCase {
     
     
     func testPullback() {
-        let numberValidator = ValidatorOf<Int> { value in
+        let numberValidator = ValidatorOf<Int, String> { value in
             if value > 5 {
                 return .valid(value)
             }
             return .error("must be greater than 5")
         }
         
-        let stringLengthValidator: ValidatorOf<String> = numberValidator.pullback(\.count)
+        let stringLengthValidator: ValidatorOf<String, String> = numberValidator.pullback(\.count)
         
         XCTAssert(
             stringLengthValidator.validate("foobar").isValid)
@@ -38,19 +38,75 @@ final class ValidatorOfTests: XCTestCase {
     }
     
     func testMapErrors() {
-        let numberValidator = ValidatorOf<Int> { value in
+        let numberValidator = ValidatorOf<Int, String> { value in
             if value > 5 {
                 return .valid(value)
             }
             return .error("must be greater than 5")
         }
         
-        let stringLengthValidator: ValidatorOf<String> = numberValidator
+        let stringLengthValidator: ValidatorOf<String, String> = numberValidator
             .pullback(\.count)
             .mapErrors { error in "length \(error)" }
                 
         XCTAssertEqual(
             "length must be greater than 5",
             stringLengthValidator.validate("foo").errors?.first)
+    }
+    
+    func testMapErrorsToNewType() {
+        struct ErrorType {
+            let message: String
+        }
+        
+        let alwaysFails = ValidatorOf<Any, String> { _ in
+            return .error("always fails")
+        }
+        
+        let alwaysFailsWithError = alwaysFails
+            .mapErrors { ErrorType(message: $0) }
+        
+        XCTAssertEqual(
+            "always fails",
+            alwaysFailsWithError.validate(0).errors?.first.message)
+    }
+    
+    func testCombineValidators() {
+        let greaterThanTwo = ValidatorOf<Int, String> { value in
+            if value > 2 {
+                return .valid(value)
+            }
+            return .error("must be greater than 2")
+        }
+        
+        let lessThanTen = ValidatorOf<Int, String> { value in
+            if value < 10 {
+                return .valid(value)
+            }
+            return .error("must be less than 10")
+        }
+        
+        let isEven = ValidatorOf<Int, String> { value in
+            if value % 2 == 0 {
+                return .valid(value)
+            }
+            return .error("must be even")
+        }
+        
+        let combined = ValidatorOf<Int, String>.combine(
+            greaterThanTwo,
+            lessThanTen,
+            isEven)
+        
+        XCTAssert(
+            combined.validate(4).isValid)
+        XCTAssertFalse(
+            combined.validate(5).isValid)
+        XCTAssertEqual(["must be even"],
+            Array(combined.validate(5).errors!))
+        XCTAssertFalse(
+            combined.validate(1).isValid)
+        XCTAssertEqual(["must be even", "must be greater than 2"].sorted(),
+            Array(combined.validate(1).errors!).sorted())
     }
 }

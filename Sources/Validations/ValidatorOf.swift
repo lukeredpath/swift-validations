@@ -18,18 +18,26 @@ extension Validated {
     }
 }
 
-struct ValidatorOf<Value> {
-    let validate: (Value) -> Validated<Value, String>
+public struct ValidatorOf<Value, Error> {
+    let validate: (Value) -> Validated<Value, Error>
     
-    func pullback<LocalValue>(_ transform: @escaping (LocalValue) -> Value) -> ValidatorOf<LocalValue> {
-        return ValidatorOf<LocalValue> { localValue in
+    public func pullback<LocalValue>(_ transform: @escaping (LocalValue) -> Value) -> ValidatorOf<LocalValue, Error> {
+        return ValidatorOf<LocalValue, Error> { localValue in
             self.validate(transform(localValue)).map { _ in localValue }
         }
     }
     
-    func mapErrors(_ transform: @escaping (String) -> String) -> ValidatorOf<Value> {
-        return ValidatorOf<Value> { value in
+    public func mapErrors<LocalError>(_ transform: @escaping (Error) -> LocalError) -> ValidatorOf<Value, LocalError> {
+        return ValidatorOf<Value, LocalError> { value in
             self.validate(value).mapErrors(transform)
+        }
+    }
+    
+    public static func combine<Value, Error>(_ validators: ValidatorOf<Value, Error>...) -> ValidatorOf<Value, Error> {
+        return ValidatorOf<Value, Error> { value in
+            validators.reduce(.valid(value)) { validated, validator in
+                return zip(validated, validator.validate(value)).map { _ in value }
+            }
         }
     }
 }
