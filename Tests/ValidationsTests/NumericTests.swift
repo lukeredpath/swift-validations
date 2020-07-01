@@ -4,7 +4,7 @@ import XCTest
 
 final class NumericTests: XCTestCase {
     func testExactly() {
-        let validation = ValidatorOf.exactly(4)
+        let validation = ValidatorOf.isExactly(4)
         
         assertNotValid(validation, given: 3)
         assertValid(validation, given: 4)
@@ -12,14 +12,14 @@ final class NumericTests: XCTestCase {
     }
     
     func testEven() {
-        let validation = ValidatorOf.even
+        let validation = ValidatorOf.isEven
         
         assertValid(validation, given: 2)
         assertNotValid(validation, given: 3, errors: ["must be even"])
     }
     
     func testOdd() {
-        let validation = ValidatorOf.odd
+        let validation = ValidatorOf.isOdd
         
         assertValid(validation, given: 3)
         assertNotValid(validation, given: 4, errors: ["must be odd"])

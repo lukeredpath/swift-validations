@@ -17,7 +17,12 @@ extension ValidatorOf where Value == String, Error == String {
         }
     }
     
-    public static func hasLengthOf(_ validator: ValidatorOf<Int, Error>) -> Self {
-        return validator.pullback(\.count).mapErrors { "length \($0)" }
+    public static func itsLength(_ validator: ValidatorOf<Int, Error>) -> Self {
+        validator.pullback(\.count).mapErrors { "length \($0)" }
+    }
+    
+    public static func hasLengthOf(_ length: Int) -> Self {
+        itsLength(.isExactly(length))
     }
 }
+

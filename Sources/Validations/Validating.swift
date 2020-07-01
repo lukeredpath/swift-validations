@@ -1,26 +1,44 @@
 @_exported import Validated
 
-@dynamicMemberLookup
+@dynamicMemberLookup @propertyWrapper
 public struct Validating<Value> {
-    public typealias ErrorType = String
-    
-    public var value: Value {
-        didSet {
-            validatedValue = validator.validate(value)
+    public struct Errors {
+        public var key: String? = nil
+        public var errors: [String] = []
+        
+        func combine(with otherErrors: [String]) -> Errors {
+            return Errors(key: key, errors: errors + otherErrors)
         }
     }
-    let validator: ValidatorOf<Value, ErrorType>
     
-    private var validatedValue: Validated<Value, ErrorType>
+    public var wrappedValue: Value {
+        didSet {
+            validatedValue = validator.validate(wrappedValue)
+        }
+    }
+    let validator: ValidatorOf<Value, String>
+    var validatedValue: Validated<Value, String>
+    var errorKey: String?
     
-    public init(initialValue: Value, validator: ValidatorOf<Value, ErrorType>) {
-        self.value = initialValue
-        self.validator = validator
-        self.validatedValue = validator.validate(value)
+    public var projectedValue: Validated<Value, String> { validatedValue }
+    
+    public var errors: Errors? {
+        switch validatedValue {
+        case .valid:
+            return nil
+        case let .invalid(errorStrings):
+            return Errors(key: errorKey, errors: Array(errorStrings))
+        }
     }
     
-    public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, ErrorType>, T>) -> T {
+    public init(wrappedValue: Value, _ validator: ValidatorOf<Value, String>, errorKey: String? = "") {
+        self.wrappedValue = wrappedValue
+        self.validator = validator
+        self.errorKey = errorKey
+        self.validatedValue = validator.validate(wrappedValue)
+    }
+    
+    public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, String>, T>) -> T {
         return validatedValue[keyPath: keyPath]
     }
 }
-

@@ -11,7 +11,7 @@ final class CollectionTests: XCTestCase {
     }
     
     func testEqualTo() {
-        let validation = ValidatorOf<Array<Int>, String>.equalTo([1, 2, 3])
+        let validation = ValidatorOf<Array<Int>, String>.isEqualTo([1, 2, 3])
         assertValid(validation, given: [1, 2, 3])
         assertNotValid(validation, given: [1, 2], errors: ["must be equal to '[1, 2, 3]'"])
     }

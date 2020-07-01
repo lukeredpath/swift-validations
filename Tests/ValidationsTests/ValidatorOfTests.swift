@@ -133,3 +133,4 @@ final class ValidatorOfTests: XCTestCase {
         assertNotValid(validator, given: "goodbye")
     }
 }
+

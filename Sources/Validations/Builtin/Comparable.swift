@@ -1,5 +1,5 @@
 extension ValidatorOf where Value: Comparable, Error == String {
-    public static func atLeast(_ minimum: Value) -> Self {
+    public static func isAtLeast(_ minimum: Value) -> Self {
         Self { value in
             if value >= minimum {
                 return .valid(value)
@@ -8,7 +8,7 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
-    public static func atMost(_ maximum: Value) -> Self {
+    public static func isAtMost(_ maximum: Value) -> Self {
         Self { value in
             if value <= maximum {
                 return .valid(value)
@@ -17,7 +17,7 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
-    public static func lessThan(_ upperBound: Value) -> Self {
+    public static func isLessThan(_ upperBound: Value) -> Self {
         Self { value in
             if value < upperBound {
                 return .valid(value)
@@ -26,7 +26,7 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
-    public static func greaterThan(_ lowerBound: Value) -> Self {
+    public static func isGreaterThan(_ lowerBound: Value) -> Self {
         Self { value in
             if value > lowerBound {
                 return .valid(value)

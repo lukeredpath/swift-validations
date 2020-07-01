@@ -4,7 +4,7 @@ import XCTest
 
 final class StringTests: XCTestCase {
     func testHasLengthOf() {
-        let validation = ValidatorOf<String, String>.hasLengthOf(.exactly(3))
+        let validation = ValidatorOf<String, String>.itsLength(.isExactly(3))
         
         assertValid(validation, given: "foo")
         assertNotValid(validation, given: "foobar", errors: ["length must be exactly 3"])
@@ -25,7 +25,7 @@ final class StringTests: XCTestCase {
     }
     
     func testEqualTo() {
-        let validation = ValidatorOf<String, String>.equalTo("foo")
+        let validation = ValidatorOf<String, String>.isEqualTo("foo")
         assertValid(validation, given: "foo")
         assertNotValid(validation, given: "foobar", errors: ["must be equal to 'foo'"])
     }

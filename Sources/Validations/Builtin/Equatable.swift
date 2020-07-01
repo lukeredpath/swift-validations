@@ -1,5 +1,5 @@
 extension ValidatorOf where Value: Equatable, Error == String {
-    public static func equalTo(_ other: Value) -> Self {
+    public static func isEqualTo(_ other: Value) -> Self {
         Self { value in
             if value == other {
                 return .valid(value)
