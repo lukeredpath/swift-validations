@@ -33,15 +33,17 @@ class ValidatingTests: XCTestCase {
             var numbers: [Int] = []
             
             var isValid: Bool {
-                zip(self.$intValue,
-                    self.$stringValue).isValid
+                zip($intValue,
+                    $stringValue,
+                    $numbers).isValid
             }
         }
         
-        var container = ValidatingContainer(numbers: [])
+        var container = ValidatingContainer()
         XCTAssertFalse(container.isValid)
         
         container.intValue = 2
+        container.numbers = [2, 3]
         XCTAssertFalse(container.isValid)
         
         container.stringValue = "foo"
@@ -49,6 +51,7 @@ class ValidatingTests: XCTestCase {
         
         container.stringValue = "foobar"
         container.intValue = 4
+        container.numbers = [1, 2, 3]
         XCTAssert(container.isValid)
     }
 }
