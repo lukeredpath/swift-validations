@@ -18,7 +18,7 @@ class ValidatingTests: XCTestCase {
         var validatedInt = Validating<Int>(wrappedValue: 0, .isEven)
         validatedInt.wrappedValue = 1
         
-        XCTAssertEqual(["must be even"], validatedInt.errors?.errors)
+        XCTAssertEqual(["must be even"], Array(validatedInt.errors!))
     }
     
     func testPropertyWrapperUsage() {

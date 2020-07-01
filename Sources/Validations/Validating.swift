@@ -2,15 +2,6 @@
 
 @dynamicMemberLookup @propertyWrapper
 public struct Validating<Value> {
-    public struct Errors {
-        public var key: String? = nil
-        public var errors: [String] = []
-        
-        func combine(with otherErrors: [String]) -> Errors {
-            return Errors(key: key, errors: errors + otherErrors)
-        }
-    }
-    
     public var wrappedValue: Value {
         didSet {
             validatedValue = validator.validate(wrappedValue)
@@ -18,28 +9,17 @@ public struct Validating<Value> {
     }
     let validator: ValidatorOf<Value, String>
     var validatedValue: Validated<Value, String>
-    var errorKey: String?
     
     public var projectedValue: Validated<Value, String> { validatedValue }
     
-    public var errors: Errors? {
-        switch validatedValue {
-        case .valid:
-            return nil
-        case let .invalid(errorStrings):
-            return Errors(key: errorKey, errors: Array(errorStrings))
-        }
-    }
-    
-    public init(wrappedValue: Value, _ validator: ValidatorOf<Value, String>, errorKey: String? = "") {
+    public init(wrappedValue: Value, _ validator: ValidatorOf<Value, String>) {
         self.wrappedValue = wrappedValue
         self.validator = validator
-        self.errorKey = errorKey
         self.validatedValue = validator.validate(wrappedValue)
     }
     
-    public init(wrappedValue: Value, _ validators: ValidatorOf<Value, String>..., errorKey: String? = "") {
-        self.init(wrappedValue: wrappedValue, .combine(validators), errorKey: errorKey)
+    public init(wrappedValue: Value, _ validators: ValidatorOf<Value, String>...) {
+        self.init(wrappedValue: wrappedValue, .combine(validators))
     }
     
     public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, String>, T>) -> T {
