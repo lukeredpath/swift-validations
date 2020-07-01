@@ -168,7 +168,7 @@ The following validators are built-in and can be combined to form more domain-sp
 
 The library ships with a `Validating` type which can be used either on it's own or as a property wrapper. The `Validating<Value>` wraps both a value of type `Value` and a `ValidatorOf<Value, String>` that re-validates every time `Value` is updated, producing a new `Validated<Value>` which is stored internally. 
 
-The `Validating` type provides dynamic property access to the underlying `Validated<Value>` so you can check if it is valid or any errors.
+The `Validating` type provides dynamic property access to the underlying `Validated<Value>` so you can check if it is valid or access any errors.
 
 ### Simple usage
 
