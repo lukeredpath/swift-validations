@@ -101,3 +101,66 @@ XCTAssert(ageValidator.validate(12).isValid)
 XCTAssertFalse(ageValidator.validate(9).isValid)
 XCTAssertFalse(ageValidator.validate(21).isValid)
 ```
+
+### Negating validators
+
+A validator that operates as the logical inverse of an existing validator can be produced using the `negated()` method on `ValidatorOf`.
+
+For example, given a validator that checks for odd numbers:
+
+```
+let isOdd = ValidatorOf<Int, String> { 
+    if $0 % 2 == 1 { 
+        return .valid($0)
+    }
+    return .error("is not odd"")
+}
+```
+
+You could create a validator that checks for even numbers by negating it. When negating a matcher, a new error message should be provided for the negated error case.
+
+```
+let isEven = isOdd.negated(withError: "is not even")
+```
+
+A static function `.not` is provided as syntatic sugar. The above could be re-written as:
+
+```
+let isEven: Validator<Int, String> = .not(isOdd)
+```
+
+### Built-in validators
+
+The following validators are built-in and can be combined to form more domain-specific validations in your code:
+
+* Boolean
+    - `isTrue`
+    - `isFalse`
+* Collection
+    - `hasLengthOf`
+    - `contains` (where `Collection<T: Equatable>`)
+* Comparable
+    - `isAtLeast`
+    - `isAtMost`
+    - `isLessThan`
+    - `isGreaterThan`
+    - `isInRange(x...y)`
+    - `isInRange(x..<y)`
+* Collection Membership
+    - `isIncluded(in: Array)`
+    - `isExcluded(from: Array)`
+    - `isIncluded(in: Set)`
+    - `isExcluded(from: Set)`
+* Equatable
+    - `isEqualTo`
+* Numeric
+    - `isExactly`
+    - `isOdd`
+    - `isEven`
+* String
+    - `itsLength(<numeric validator type>)`
+    - `hasLengthOf`
+    - `beginsWith`
+    - `endsWith`
+    - `matchesPattern(_, as:)` (defaults to `.regularExpression`)
+

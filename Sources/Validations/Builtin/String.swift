@@ -38,5 +38,14 @@ extension ValidatorOf where Value == String, Error == String {
             return .error("must match pattern")
         }
     }
+    
+    public static let isEmpty = Self { value in
+        if value == "" {
+            return .valid(value)
+        }
+        return .error("must be empty")
+    }
+    
+    public static let isNotEmpty = isEmpty.negated(withError: "must not be empty")
 }
 

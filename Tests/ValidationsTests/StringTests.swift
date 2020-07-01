@@ -44,4 +44,18 @@ final class StringTests: XCTestCase {
         assertValid(validation, given: "FOO")
         assertNotValid(validation, given: "bar", errors: ["must match pattern"])
     }
+    
+    func testIsEmpty() {
+        let validation = ValidatorOf<String, String>.isEmpty
+        
+        assertValid(validation, given: "")
+        assertNotValid(validation, given: "a", errors: ["must be empty"])
+    }
+    
+    func testIsNotEmpty() {
+        let validation = ValidatorOf<String, String>.isNotEmpty
+        
+        assertValid(validation, given: "a")
+        assertNotValid(validation, given: "", errors: ["must not be empty"])
+    }
 }
