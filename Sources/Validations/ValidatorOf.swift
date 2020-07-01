@@ -29,6 +29,17 @@ public struct ValidatorOf<Value, Error> {
         }
     }
     
+    public func negated(withError error: Error) -> Self {
+        Self {
+            switch self.validate($0) {
+            case .valid:
+                return .error(error)
+            case .invalid:
+                return .valid($0)
+            }
+        }
+    }
+    
     public func mapErrors<LocalError>(_ transform: @escaping (Error) -> LocalError) -> ValidatorOf<Value, LocalError> {
         return ValidatorOf<Value, LocalError> { value in
             self.validate(value).mapErrors(transform)
