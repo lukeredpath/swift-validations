@@ -103,7 +103,7 @@ func assertNotValid<Value, Error>(
     filePath: StaticString = #file,
     line: UInt = #line
 ) where Error: Comparable {
-    _assertNotValid(vlidator, given: value, errors: errors, filePath: filePath, line: line)
+    _assertNotValid(validator, given: value, errors: errors, filePath: filePath, line: line)
 }
 #endif
 
