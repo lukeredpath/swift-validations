@@ -34,10 +34,17 @@ class ValidatingTests: XCTestCase {
             )
             var stringValue: String = ""
             
-            @Validating(
-                .its(\.first, .isEqualTo(1))
-            )
+            // There seems to be a bug or undefined behaviour when using
+            // a keypath as a function inside a property-wrapper call on Swift 5.2
+            // https://forums.swift.org/t/keypath-as-function-inside-property-wrapper-doesnt-compile-in-5-2-fine-in-5-3/38074
+            
+            #if compiler(>=5.3)
+            @Validating(.its(\.first, .isEqualTo(1)))
             var numbers: [Int] = []
+            #else
+            @Validating(.its({ $0.first }, .isEqualTo(1)))
+            var numbers: [Int] = []
+            #endif
             
             var isValid: Bool {
                 zip($intValue,
