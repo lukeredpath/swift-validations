@@ -34,4 +34,22 @@ final class ComparableTests: XCTestCase {
         assertValid(validation, given: 4)
         assertNotValid(validation, given: 5, errors: ["must be at most 4"])
     }
+    
+    func testIsInClosedRange() {
+        let validation = ValidatorOf.isInRange(1...5)
+        
+        assertValid(validation, given: 1)
+        assertValid(validation, given: 3)
+        assertValid(validation, given: 5)
+        assertNotValid(validation, given: 6, errors: ["must be in range 1...5"])
+    }
+    
+    func testIsInHalfClosedRange() {
+        let validation = ValidatorOf.isInRange(1..<5)
+        
+        assertValid(validation, given: 1)
+        assertValid(validation, given: 3)
+        assertNotValid(validation, given: 5, errors: ["must be in range 1..<5"])
+        assertNotValid(validation, given: 6, errors: ["must be in range 1..<5"])
+    }
 }

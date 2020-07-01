@@ -34,4 +34,22 @@ extension ValidatorOf where Value: Comparable, Error == String {
             return .error("must be greater than \(lowerBound)")
         }
     }
+    
+    public static func isInRange(_ range: ClosedRange<Value>) -> Self {
+        Self { value in
+            if range.contains(value) {
+                return .valid(value)
+            }
+            return .error("must be in range \(range)")
+        }
+    }
+    
+    public static func isInRange(_ range: Range<Value>) -> Self {
+        Self { value in
+            if range.contains(value) {
+                return .valid(value)
+            }
+            return .error("must be in range \(range)")
+        }
+    }
 }
