@@ -132,5 +132,12 @@ final class ValidatorOfTests: XCTestCase {
         assertValid(validator, given: "hello")
         assertNotValid(validator, given: "goodbye")
     }
+    
+    func testNegatedValidator() {
+        let validator = ValidatorOf<String, String>.not(.isEqualTo("foo"), error: "is not equal to foo")
+        
+        assertValid(validator, given: "bar")
+        assertNotValid(validator, given: "foo", errors: ["is not equal to foo"])
+    }
 }
 

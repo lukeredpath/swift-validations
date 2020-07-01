@@ -71,4 +71,8 @@ extension ValidatorOf {
     static func its<T>(_ transform: @escaping (Value) -> T, _ validator: ValidatorOf<T, Error>) -> Self {
         validator.pullback(transform)
     }
+    
+    static func not(_ validator: Self, error: Error) -> Self {
+        return validator.negated(withError: error)
+    }
 }
