@@ -72,6 +72,17 @@ extension ValidatorOf {
         validator.pullback(transform)
     }
     
+    #if compiler(<5.3)
+    /*
+    There seems to be a bug or undefined using a keypath as a function inside a property-wrapper call on Swift 5.2,
+     so to workaround it we can can provide overload that takes a key path explicitly.
+    https://forums.swift.org/t/keypath-as-function-inside-property-wrapper-doesnt-compile-in-5-2-fine-in-5-3/38074
+    */
+    static func its<T>(_ keyPath: KeyPath<Value, T>, _ validator: ValidatorOf<T, Error>) -> Self {
+        validator.pullback { $0[keyPath: keyPath] }
+    }
+    #endif
+    
     static func not(_ validator: Self, error: Error) -> Self {
         return validator.negated(withError: error)
     }
