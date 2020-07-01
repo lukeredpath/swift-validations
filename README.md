@@ -108,7 +108,7 @@ A validator that operates as the logical inverse of an existing validator can be
 
 For example, given a validator that checks for odd numbers:
 
-```
+```swift
 let isOdd = ValidatorOf<Int, String> { 
     if $0 % 2 == 1 { 
         return .valid($0)
@@ -119,13 +119,13 @@ let isOdd = ValidatorOf<Int, String> {
 
 You could create a validator that checks for even numbers by negating it. When negating a matcher, a new error message should be provided for the negated error case.
 
-```
+```swift
 let isEven = isOdd.negated(withError: "is not even")
 ```
 
 A static function `.not` is provided as syntatic sugar. The above could be re-written as:
 
-```
+```swift
 let isEven: Validator<Int, String> = .not(isOdd)
 ```
 
@@ -164,3 +164,50 @@ The following validators are built-in and can be combined to form more domain-sp
     - `endsWith`
     - `matchesPattern(_, as:)` (defaults to `.regularExpression`)
 
+## Validating and @Validating
+
+The library ships with a `Validating` type which can be used either on it's own or as a property wrapper. The `Validating<Value>` wraps both a value of type `Value` and a `ValidatorOf<Value, String>` that re-validates every time `Value` is updated, producing a new `Validated<Value>` which is stored internally. 
+
+The `Validating` type provides dynamic property access to the underlying `Validated<Value>` so you can check if it is valid or any errors.
+
+### Simple usage
+
+```swift
+let validator: ValidatorOf<String, String> = .combine(
+    .hasPrefix("foo"), 
+    .hasLengthOf(.atLeast(4))
+)
+
+var validatingString: Validating<String> = Validating(wrappedValue: "", validator: validator)
+
+XCTAssertEqual("", validatingString.wrappedValue)
+XCTAssertFalse(validatingString.isValid)
+
+validatingString.wrappedValue = "foobar"
+XCTAssert(validatingString.isValid)
+```
+
+### Property wrapper usage
+
+```swift
+struct FormViewModel {
+    @Validating(
+        .hasLengthOf(.atLeast(3))
+    )
+    var name: String
+    
+    @Validating(
+        .isInRange(13...80)
+    )
+    var age: Int
+}
+```
+When used as a property wrapper, you can use the `$var` syntax to access the `Validated<Value>` directly to check if they are valid. Using the `zip` function provided by the `Validated` library, you could implement an `isValid()` method for the entire view model:
+
+```swift
+extension FormViewModel {
+    var isValid: Bool {
+        zip($name, $age).isValid
+    }
+}
+```
