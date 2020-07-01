@@ -9,6 +9,15 @@ extension Validated {
             return .invalid(errors.map(transform))
         }
     }
+    
+    func reduceErrors<T>(_ initialValue: T, _ reducer: (T, Error) -> T) -> Validated<Value, T> {
+        switch self {
+        case let .valid(value):
+            return .valid(value)
+        case let .invalid(errors):
+            return .error(errors.reduce(initialValue, reducer))
+        }
+    }
 }
 
 public struct ValidatorOf<Value, Error> {
@@ -26,11 +35,25 @@ public struct ValidatorOf<Value, Error> {
         }
     }
     
+    func reduceErrors<ReducedError>(
+        _ initialValue: ReducedError,
+        reducer: @escaping (ReducedError, Error) -> ReducedError) -> ValidatorOf<Value, ReducedError> {
+        return ValidatorOf<Value, ReducedError> { value in
+            self.validate(value).reduceErrors(initialValue, reducer)
+        }
+    }
+    
     public static func combine<Value, Error>(_ validators: ValidatorOf<Value, Error>...) -> ValidatorOf<Value, Error> {
         return ValidatorOf<Value, Error> { value in
             validators.reduce(.valid(value)) { validated, validator in
                 return zip(validated, validator.validate(value)).map { _ in value }
             }
         }
+    }
+}
+
+extension ValidatorOf {
+    static func its<T>(_ transform: @escaping (Value) -> T, _ validator: ValidatorOf<T, Error>) -> Self {
+        validator.pullback(transform)
     }
 }

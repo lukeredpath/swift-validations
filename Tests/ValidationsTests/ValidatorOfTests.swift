@@ -109,4 +109,27 @@ final class ValidatorOfTests: XCTestCase {
         XCTAssertEqual(["must be even", "must be greater than 2"].sorted(),
             Array(combined.validate(1).errors!).sorted())
     }
+    
+    func testReduceErrors() {
+        let alwaysFailsOne = ValidatorOf<Any, String> { _ in .error("failure one") }
+        let alwaysFailsTwo = ValidatorOf<Any, String> { _ in .error("failure two") }
+        
+        let arrayCollectingValidator = ValidatorOf<Any, String>
+            .combine(alwaysFailsOne, alwaysFailsTwo)
+            .reduceErrors([]) { collector, error in
+                collector + [error]
+            }
+        
+        let validated = arrayCollectingValidator.validate("anything")
+        let errorArray = validated.errors!.first
+        
+        XCTAssertEqual(["failure one", "failure two"], errorArray)
+    }
+    
+    func testItsValidator() {
+        let validator = ValidatorOf<String, String>.its(\.first, .isEqualTo("h"))
+        
+        assertValid(validator, given: "hello")
+        assertNotValid(validator, given: "goodbye")
+    }
 }
