@@ -1,3 +1,5 @@
+import Foundation
+
 extension ValidatorOf where Value == String, Error == String {
     public static func beginsWith(_ prefix: String) -> Self {
         Self { value in
@@ -23,6 +25,18 @@ extension ValidatorOf where Value == String, Error == String {
     
     public static func hasLengthOf(_ length: Int) -> Self {
         itsLength(.isExactly(length))
+    }
+    
+    public static func matchesPattern(
+        _ pattern: String,
+        as options: NSString.CompareOptions = .regularExpression
+    ) -> Self {
+        Self { value in
+            if value.range(of: pattern, options: options) != nil {
+                return .valid(value)
+            }
+            return .error("must match pattern")
+        }
     }
 }
 

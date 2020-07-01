@@ -29,4 +29,19 @@ final class StringTests: XCTestCase {
         assertValid(validation, given: "foo")
         assertNotValid(validation, given: "foobar", errors: ["must be equal to 'foo'"])
     }
+    
+    func testMatchesPatternUsingRegularExpression() {
+        let validation = ValidatorOf<String, String>.matchesPattern(#"\d+"#)
+        
+        assertValid(validation, given: "123")
+        assertNotValid(validation, given: "no numbers here!", errors: ["must match pattern"])
+    }
+    
+    func testMatchesPatternUsingOptions() {
+        let validation = ValidatorOf<String, String>.matchesPattern("foo", as: .caseInsensitive)
+        
+        assertValid(validation, given: "foo")
+        assertValid(validation, given: "FOO")
+        assertNotValid(validation, given: "bar", errors: ["must match pattern"])
+    }
 }
