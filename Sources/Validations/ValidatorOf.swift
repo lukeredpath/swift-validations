@@ -44,6 +44,10 @@ public struct ValidatorOf<Value, Error> {
     }
     
     public static func combine<Value, Error>(_ validators: ValidatorOf<Value, Error>...) -> ValidatorOf<Value, Error> {
+        combine(validators)
+    }
+    
+    public static func combine<Value, Error>(_ validators: [ValidatorOf<Value, Error>]) -> ValidatorOf<Value, Error> {
         return ValidatorOf<Value, Error> { value in
             validators.reduce(.valid(value)) { validated, validator in
                 return zip(validated, validator.validate(value)).map { _ in value }

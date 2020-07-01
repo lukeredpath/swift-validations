@@ -38,6 +38,10 @@ public struct Validating<Value> {
         self.validatedValue = validator.validate(wrappedValue)
     }
     
+    public init(wrappedValue: Value, _ validators: ValidatorOf<Value, String>..., errorKey: String? = "") {
+        self.init(wrappedValue: wrappedValue, .combine(validators), errorKey: errorKey)
+    }
+    
     public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, String>, T>) -> T {
         return validatedValue[keyPath: keyPath]
     }

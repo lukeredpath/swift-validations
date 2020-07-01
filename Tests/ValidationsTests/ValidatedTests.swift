@@ -23,13 +23,20 @@ class ValidatingTests: XCTestCase {
     
     func testPropertyWrapperUsage() {
         struct ValidatingContainer {
-            @Validating(.isGreaterThan(3))
+            @Validating(
+                .isGreaterThan(3),
+                .isLessThan(10)
+            )
             var intValue: Int = 0
             
-            @Validating(.itsLength(.isAtLeast(5)))
+            @Validating(
+                .itsLength(.isAtLeast(5))
+            )
             var stringValue: String = ""
             
-            @Validating(.its(\.first, .isEqualTo(1)))
+            @Validating(
+                .its(\.first, .isEqualTo(1))
+            )
             var numbers: [Int] = []
             
             var isValid: Bool {
@@ -50,8 +57,11 @@ class ValidatingTests: XCTestCase {
         XCTAssertFalse(container.isValid)
         
         container.stringValue = "foobar"
-        container.intValue = 4
+        container.intValue = 11
         container.numbers = [1, 2, 3]
+        XCTAssertFalse(container.isValid)
+        
+        container.intValue = 9
         XCTAssert(container.isValid)
     }
 }
