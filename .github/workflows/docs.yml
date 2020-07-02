@@ -1,0 +1,32 @@
+# Build and publish generate docs to Github Pages
+name: Publish Docs
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  library:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        xcode:
+          - 11.5
+            - 
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Jazzy
+      run: gem install jazzy
+
+    - name: Generate documentation
+      run: make docs
+    
+    - name: Deploy to Github Pages
+      uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
