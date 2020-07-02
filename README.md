@@ -8,6 +8,8 @@ Validations is a high-level validation library, written in a functional style. I
 
 The library builds on top of the `Validated` type provided by the [Validated](https://github.com/pointfreeco/swift-validated) library.
 
+[API Documentation](https://lukeredpath.github.io/swift-validations/)
+
 ## Core API
 
 Fundamentally, a validator can be expressed as a generic function of type:
