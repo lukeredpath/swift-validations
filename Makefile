@@ -1,12 +1,10 @@
-install-dependencies:
-	gem install xcpretty jazzy
 build:
 	swift build
 test:
-	swift test 2>&1 | xcpretty
+	swift test 2>&1 | bundle exec xcpretty
 cleandocs:
 	rm -fr docs
 docs: cleandocs
-	jazzy \
+	bundle exec jazzy \
 		--module Validations \
 		--swift-build-tool spm \

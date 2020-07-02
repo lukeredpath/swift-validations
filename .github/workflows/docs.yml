@@ -9,7 +9,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  library:
+  docs:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -19,8 +19,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Jazzy
-      run: gem install jazzy
+    - name: Cache gems
+      uses: actions/cache@preview
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gem-
+
+    - name: Install Gems
+      run: |
+        bundle config path vendor/bundle
+        bundle config with docs
+        bundle install
 
     - name: Generate documentation
       run: make docs
