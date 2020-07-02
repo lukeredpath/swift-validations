@@ -1,6 +1,6 @@
 import XCTest
 import Validated
-
+import Combine
 @testable import Validations
 
 final class ValidatorOfTests: XCTestCase {
@@ -11,7 +11,6 @@ final class ValidatorOfTests: XCTestCase {
             }
             return .error("must be greater than 5")
         }
-        
         XCTAssert(
             numberValidator.validate(6).isValid)
         XCTAssertFalse(
