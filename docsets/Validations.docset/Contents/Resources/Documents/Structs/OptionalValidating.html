@@ -14,7 +14,7 @@
     <a title="OptionalValidating Structure Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Validations Docs</a> (26% documented)</p>
+        <p><a href="../index.html">Validations Docs</a> (100% documented)</p>
       </div>
     </header>
     <div class="content-wrapper">
@@ -55,7 +55,11 @@
 
                 </div>
               </div>
-            <p>Undocumented</p>
+            <p>A type that wraps an optional of type <code>Value</code> and an associated validator and re-validates every time the value is updated.</p>
+
+<p>This type is the functional equivalent of <code><a href="../Structs/Validating.html">Validating</a></code> but for optional values. This version should be used when you cannot provide a default value for a property on a type but still need to validate it, including if the value is required or not. Whilst it is preferable to use the Swift type system to declare whether or not a value is optional, it might not always be possible, e.g. if you need to capture some required value from user input but do not have any meaningful default that you can assign to the variable where it is declared.</p>
+
+<p>Unless explicitly stated otherwise during initalisation, values are always treated as required, i.e. if the value is <code>nil</code> then validation will return an  <code>.invalid</code> result. It is possible to specify that a value is not required in which case validation will only be run if the value is non-nil and otherwise will be treated as <code>.valid</code>.</p>
 
           </section>
           <section class="section task-group-section">
@@ -74,7 +78,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The optional wrapped value - changing the value will trigger validation.</p>
 
                       </div>
                       <div class="declaration">
@@ -101,7 +105,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Returns the <code>validatedValue</code> when using <code>$value</code> syntax.</p>
 
                       </div>
                       <div class="declaration">
@@ -128,7 +132,15 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initialises a new instance.</p>
+
+<p>This initialiser will be called whenever you use the <code>@OptionalValidating</code> property wrapper and specify a default value for the optional property.</p>
+
+<p>By default, the value will be treated as required, which means any <code>nil</code> value will be treated as invalid.</p>
+
+<p>This method will automatically validate the initial <code><a href="../Structs/OptionalValidating.html#/s:11Validations18OptionalValidatingV12wrappedValuexSgvp">wrappedValue</a></code>, meaning a <code>validatedValue</code> will be available immediately after initialisation.</p>
+
+<p>You should pass in a non-optional validator - it will be converted to an optional validator automatically.</p>
 
                       </div>
                       <div class="declaration">
@@ -138,6 +150,49 @@
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">wrappedValue</span><span class="p">:</span> <span class="kt">Value</span><span class="p">?,</span> <span class="nv">required</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="n">_</span> <span class="nv">validator</span><span class="p">:</span> <span class="kt"><a href="../Structs/ValidatorOf.html">ValidatorOf</a></span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>wrappedValue</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The value being wrapped</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>required</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>If <code>true</code>, <code>nil</code> values will be treated as invalid. Defaults to <code>true</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>validator</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The validator to use every time <code><a href="../Structs/OptionalValidating.html#/s:11Validations18OptionalValidatingV12wrappedValuexSgvp">wrappedValue</a></code> is changed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -155,7 +210,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A convenience initialiser that takes a variadic list of validators and automatically combines them into a single validator.</p>
 
                       </div>
                       <div class="declaration">
@@ -182,7 +237,11 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A convenience initialiser that doesn&rsquo;t require an initial <code><a href="../Structs/OptionalValidating.html#/s:11Validations18OptionalValidatingV12wrappedValuexSgvp">wrappedValue</a></code>.</p>
+
+<p>This method will be called when using the <code>@OptionalValidating</code> property wrapper with a property that has no initial value.</p>
+
+<p>You must explicitly state whether or not the value is required or not.</p>
 
                       </div>
                       <div class="declaration">
@@ -192,6 +251,37 @@
                           <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">required</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="n">_</span> <span class="nv">validator</span><span class="p">:</span> <span class="kt"><a href="../Structs/ValidatorOf.html">ValidatorOf</a></span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span><span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>required</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>If <code>true</code>, <code>nil</code> values will be treated as invalid. Defaults to <code>true</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>validator</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The validator to use every time <code><a href="../Structs/OptionalValidating.html#/s:11Validations18OptionalValidatingV12wrappedValuexSgvp">wrappedValue</a></code> is changed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -209,7 +299,9 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A convenience initialiser that doesn&rsquo;t require an initial <code><a href="../Structs/OptionalValidating.html#/s:11Validations18OptionalValidatingV12wrappedValuexSgvp">wrappedValue</a></code>.</p>
+
+<p>This method takes a variadic list of validators and combines them into one automatically.</p>
 
                       </div>
                       <div class="declaration">
@@ -236,7 +328,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Provides dynamic access to the underlying validated value&rsquo;s properties.</p>
 
                       </div>
                       <div class="declaration">

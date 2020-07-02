@@ -14,7 +14,7 @@
     <a title="Structures  Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="index.html">Validations Docs</a> (26% documented)</p>
+        <p><a href="index.html">Validations Docs</a> (100% documented)</p>
       </div>
     </header>
     <div class="content-wrapper">
@@ -114,7 +114,21 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A type that wraps a value of type <code>Value</code> and an associated validator and re-validates every time value is updated.</p>
+
+<p>This type can be used to associate a value and its validation rules and have that value be re-validated every time it changes, check if it is valid and if not, what the validation errors are. It has dynamic member lookup support to provide direct access to the validated value.</p>
+
+<p>Its primary use is as a property wrapper that lets you declaratively validate properties on your types. When used this way, you can access the validated version of your property using the $property syntax.</p>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">MyViewModel</span> <span class="p">{</span>
+    <span class="kd">@Validating(.hasLengthOf(.atLeast(6)</span><span class="p">)</span>
+    <span class="k">var</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="s">""</span>
+<span class="p">}</span>
+
+<span class="k">var</span> <span class="nv">viewModel</span> <span class="o">=</span> <span class="kt">MyViewModel</span><span class="p">()</span>
+<span class="n">viewModel</span><span class="o">.</span><span class="err">$</span><span class="n">password</span><span class="o">.</span><span class="n">isValid</span> <span class="c1">// returns false</span>
+<span class="n">viewModel</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s">"mypassword"</span>
+<span class="n">viewModel</span><span class="o">.</span><span class="err">$</span><span class="n">password</span><span class="o">.</span><span class="n">isValid</span> <span class="c1">// returns true</span>
+</code></pre>
 
                         <a href="Structs/Validating.html" class="slightly-smaller">See more</a>
                       </div>
@@ -144,7 +158,11 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A type that wraps an optional of type <code>Value</code> and an associated validator and re-validates every time the value is updated.</p>
+
+<p>This type is the functional equivalent of <code><a href="Structs/Validating.html">Validating</a></code> but for optional values. This version should be used when you cannot provide a default value for a property on a type but still need to validate it, including if the value is required or not. Whilst it is preferable to use the Swift type system to declare whether or not a value is optional, it might not always be possible, e.g. if you need to capture some required value from user input but do not have any meaningful default that you can assign to the variable where it is declared.</p>
+
+<p>Unless explicitly stated otherwise during initalisation, values are always treated as required, i.e. if the value is <code>nil</code> then validation will return an  <code>.invalid</code> result. It is possible to specify that a value is not required in which case validation will only be run if the value is non-nil and otherwise will be treated as <code>.valid</code>.</p>
 
                         <a href="Structs/OptionalValidating.html" class="slightly-smaller">See more</a>
                       </div>
