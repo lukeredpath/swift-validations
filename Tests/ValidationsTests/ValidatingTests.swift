@@ -62,4 +62,64 @@ class ValidatingTests: XCTestCase {
         container.intValue = 9
         XCTAssert(container.isValid)
     }
+    
+    func testPropertyWrapperWithOptionalValues() {
+        struct OptionallyValidatingContainer {
+            @OptionalValidating(
+                .isGreaterThan(3)
+            )
+            var implicitlyRequiredIntValue: Int? = 4
+            
+            @OptionalValidating(
+                required: true,
+                .isGreaterThan(3)
+            )
+            var explicitlyRequiredValueWithNoDefault: Int?
+            
+            @OptionalValidating(
+                required: true,
+                .isGreaterThan(3)
+            )
+            var explicitlyRequiredValueWithDefault: Int? = 4
+            
+            @OptionalValidating(
+                required: false,
+                .isGreaterThan(3)
+            )
+            var explicitlyOptionalValueWithNoDefault: Int?
+            
+            @OptionalValidating(
+                required: false,
+                .isGreaterThan(3)
+            )
+            var explicitlyOptionalValueWithDefault: Int? = 4
+        }
+        
+        var container = OptionallyValidatingContainer()
+        
+        XCTAssert(container.$implicitlyRequiredIntValue.isValid)
+        XCTAssertFalse(container.$explicitlyRequiredValueWithNoDefault.isValid)
+        XCTAssert(container.$explicitlyRequiredValueWithDefault.isValid)
+        XCTAssert(container.$explicitlyOptionalValueWithNoDefault.isValid)
+        XCTAssert(container.$explicitlyOptionalValueWithDefault.isValid)
+        
+        container.implicitlyRequiredIntValue = nil
+        XCTAssertFalse(container.$implicitlyRequiredIntValue.isValid)
+        XCTAssertEqual(["is required"], Array(container.$implicitlyRequiredIntValue.errors!))
+        
+        container.explicitlyRequiredValueWithNoDefault = 4
+        XCTAssert(container.$explicitlyRequiredValueWithNoDefault.isValid)
+        
+        container.explicitlyRequiredValueWithDefault = nil
+        XCTAssertFalse(container.$explicitlyRequiredValueWithDefault.isValid)
+        XCTAssertEqual(["is required"], Array(container.$explicitlyRequiredValueWithDefault.errors!))
+        
+        container.explicitlyOptionalValueWithNoDefault = 3
+        XCTAssertFalse(container.$explicitlyOptionalValueWithNoDefault.isValid)
+        XCTAssertEqual(["must be greater than 3"], Array(container.$explicitlyOptionalValueWithNoDefault.errors!))
+        
+        container.explicitlyOptionalValueWithDefault = 3
+        XCTAssertFalse(container.$explicitlyOptionalValueWithDefault.isValid)
+        XCTAssertEqual(["must be greater than 3"], Array(container.$explicitlyOptionalValueWithDefault.errors!))
+    }
 }

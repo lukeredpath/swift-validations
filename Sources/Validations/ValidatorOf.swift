@@ -23,9 +23,25 @@ extension Validated {
 public struct ValidatorOf<Value, Error> {
     public let validate: (Value) -> Validated<Value, Error>
     
+    public init(validate: @escaping (Value) -> Validated<Value, Error>) {
+        self.validate = validate
+    }
+    
     public func pullback<LocalValue>(_ transform: @escaping (LocalValue) -> Value) -> ValidatorOf<LocalValue, Error> {
         return ValidatorOf<LocalValue, Error> { localValue in
             self.validate(transform(localValue)).map { _ in localValue }
+        }
+    }
+    
+    public func optional(errorOnNil: Error?) -> ValidatorOf<Value?, Error> {
+        ValidatorOf<Value?, Error> { optionalValue in
+            if let value = optionalValue {
+                return self.validate(value).map(Optional.init)
+            }
+            if let error = errorOnNil {
+                return .error(error)
+            }
+            return .valid(nil)
         }
     }
     
@@ -63,6 +79,17 @@ public struct ValidatorOf<Value, Error> {
             validators.reduce(.valid(value)) { validated, validator in
                 return zip(validated, validator.validate(value)).map { _ in value }
             }
+        }
+    }
+}
+
+extension ValidatorOf where Error == String {
+    public func optional(allowNil: Bool) -> ValidatorOf<Value?, Error> {
+        ValidatorOf<Value?, Error> { optionalValue in
+            if let value = optionalValue {
+                return self.validate(value).map(Optional.init)
+            }
+            return allowNil ? .valid(nil) : .error("is required")
         }
     }
 }

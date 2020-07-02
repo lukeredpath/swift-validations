@@ -139,5 +139,23 @@ final class ValidatorOfTests: XCTestCase {
         assertValid(validator, given: "bar")
         assertNotValid(validator, given: "foo", errors: ["is not equal to foo"])
     }
+    
+    func testOptionalValidatorThatPermitsNilValues() {
+        let stringValidator = ValidatorOf<String, String>.isEqualTo("foo")
+        let optionalStringValidator = stringValidator.optional(allowNil: true)
+        
+        assertValid(optionalStringValidator, given: nil)
+        assertValid(optionalStringValidator, given: "foo")
+        assertNotValid(optionalStringValidator, given: "bar", errors: ["must be equal to \'foo\'"])
+    }
+    
+    func testOptionalValidatorThatDoesNotPermitNilValues() {
+        let stringValidator = ValidatorOf<String, String>.isEqualTo("foo")
+        let optionalStringValidator = stringValidator.optional(allowNil: false)
+        
+        assertValid(optionalStringValidator, given: "foo")
+        assertNotValid(optionalStringValidator, given: nil, errors: ["is required"])
+        assertNotValid(optionalStringValidator, given: "bar", errors: ["must be equal to \'foo\'"])
+    }
 }
 

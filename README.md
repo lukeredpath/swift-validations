@@ -129,6 +129,57 @@ A static function `.not` is provided as syntatic sugar. The above could be re-wr
 let isEven: Validator<Int, String> = .not(isOdd)
 ```
 
+### Handling optional values
+
+It is possible to create a validator over an optional value, expressed as a type `ValidatorOf<T?, Error>` - when doing so, it is up to you to define how to handle nil values. If a value is optional, you can permit nil values by returning a `.valid` result - if a value is required then you should return an invalid result with an appropriate error message. 
+
+For example, a validator on an optional `Int` that allows nil values can be defined as:
+
+```swift
+let optionalInt = ValidatorOf<Int?, String> { optionalValue in
+    if let value = optionalValue {
+        // your validation logic here
+    }
+    return .valid(optionalValue)
+}
+```
+
+Alternatively, if you always require a value in order for the validator to return a valid result, you could instead write the following:
+
+```swift
+let optionalInt = ValidatorOf<Int?, String> { optionalValue in
+    if let value = optionalValue {
+        // your validation logic here
+    }
+    return .error("is required")
+}
+```
+
+Validators that operate on optional types will return a `Validated<T?, Error>` result type.
+
+The library provides an `optional()` operator in two different forms that can be used to convert an existing validator that operates on a non-optional type to one that operates on an optional - in both cases you are required to specify how missing values should be handled.
+
+The generic overload requires that you pass in an optional error value of type `Error?` - if an error value is given then nil values will be treated as an error and will return an invalid result using the error value you give it. If no error value is given, then nil values will be treated as valid:
+
+```swift
+let ageMustBeOverTen: ValidatorOf<Int, String> = ...
+let optionalAgeValidator = ageMustBeOverTen.optional(errorOnNil: "is required")
+
+optionalAgeValidator.validate(11)   // returns Validated<Int?, String>.valid
+optionalAgeValidator.validate(10)   // returns Validated<Int?, String>.error("must be over 10")
+optionalAgeValidator.validate(nil)  // returns Validated<Int?, String>.error("is required")
+```
+
+All of the built-in validators and most of the validators you write yourself will use a `String` error type - in this case, you can use the alternative form `optional(allowNil: Bool)`, simply specifying if nil values are allowed or not - if you pass `false` then a default value of "is required" will be used:
+
+```swift
+let v1 = ValidatorOf<String, String>.hasPrefix("foo").optional(allowNil: true)
+v1.validate(nil)    // returns Validated<String?, String>.valid
+
+let v2 = ValidatorOf<String, String>.hasPrefix("foo").optional(allowNil: false)
+v2.validate(nil)    // returns Validated<String?, String>.error("is required")
+```
+
 ### Built-in validators
 
 The following validators are built-in and can be combined to form more domain-specific validations in your code:
@@ -209,5 +260,31 @@ extension FormViewModel {
     var isValid: Bool {
         zip($name, $age).isValid
     }
+}
+```
+
+### Optional values
+
+Whilst the Swift type system allows you to express whether or not a value is required using optional or non-optional values, there are times when you may have a required value but not have a sensible default value that you can set to satisfy the compiler - this is often the case when you have some kind of value that represents user input. In this case, it is preferable to make the value optional and then use a validation to enforce that it is non-nil.
+
+If you need to handle optional values, you can use the optional counterpart  `OptionalValidating`. Like `Validating` this can be used standalone or as a property-wrapper. You do not need to pass in validators on optional types as they are converted to optional forms automatically. 
+
+`OptionalValidating` can be initialized with or without an initial value. When initialised with a default value, it will treat nil values as invalid by default - this can be changed by explicitly passing in the `required` parameter. When initialised without a default value, you must explicitly state whether the value is required or not.
+
+The following example demonstrates various uses as a property wrapper:
+
+```swift
+struct FormViewModel {
+    // no default value means it is implicitly required and will start as invalid
+    @OptionalValidating(.greaterThan(10))
+    var requiredAge: Int?
+    
+    // if you can specify a default value, but still require it be non-nil you can be explicit
+    @OptionalValidating(required: true, .myPostcodeValidator)
+    var postcode: String? = ""
+    
+    // you can make a field truly optional by explicitly stating that it is not required
+    @OptionalValidating(required: false, .myPhoneNumberValidator)
+    var phoneNumber: String
 }
 ```
