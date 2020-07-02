@@ -8,3 +8,4 @@ docs: cleandocs
 	bundle exec jazzy \
 		--module Validations \
 		--swift-build-tool spm \
+		--theme fullwidth
