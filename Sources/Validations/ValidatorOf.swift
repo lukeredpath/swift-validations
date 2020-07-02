@@ -1,3 +1,4 @@
+@_exported import NonEmpty
 @_exported import Validated
 
 extension Validated {
