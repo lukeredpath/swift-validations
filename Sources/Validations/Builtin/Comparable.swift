@@ -1,4 +1,9 @@
 extension ValidatorOf where Value: Comparable, Error == String {
+    /// Validates that a value `>=` the given value.
+    ///
+    /// - Parameters:
+    ///     - minimum: The minimum expected value.
+    ///
     public static func isAtLeast(_ minimum: Value) -> Self {
         Self { value in
             if value >= minimum {
@@ -8,6 +13,11 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
+    /// Validates that a value is `<=` the given value.
+    ///
+    /// - Parameters:
+    ///     - maximum: The maximum expected value.
+    ///
     public static func isAtMost(_ maximum: Value) -> Self {
         Self { value in
             if value <= maximum {
@@ -17,6 +27,11 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
+    /// Validates that a value is `<` the given value.
+    ///
+    /// - Parameters:
+    ///     - upperBound: The amount that value should be less than.
+    ///
     public static func isLessThan(_ upperBound: Value) -> Self {
         Self { value in
             if value < upperBound {
@@ -26,6 +41,11 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
+    /// Validates that a value is `>` the given value.
+    ///
+    /// - Parameters:
+    ///     - lowerBound: The amount that the value should be greater than.
+    ///
     public static func isGreaterThan(_ lowerBound: Value) -> Self {
         Self { value in
             if value > lowerBound {
@@ -35,6 +55,11 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
+    /// Validates that a value is within the given range.
+    ///
+    /// - Parameters:
+    ///     - range: A closed range that the value should be within.
+    ///
     public static func isInRange(_ range: ClosedRange<Value>) -> Self {
         Self { value in
             if range.contains(value) {
@@ -44,6 +69,11 @@ extension ValidatorOf where Value: Comparable, Error == String {
         }
     }
     
+    /// Validates that a value is within the given range.
+    ///
+    /// - Parameters:
+    ///     - range: An unclosed range that the value should be within.
+    ///
     public static func isInRange(_ range: Range<Value>) -> Self {
         Self { value in
             if range.contains(value) {
