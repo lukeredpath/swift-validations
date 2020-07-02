@@ -84,9 +84,11 @@ public struct ValidatorOf<Value, Error> {
     ///
     /// - Parameters:
     ///     - transform: A function that converts some other type `LocalValue` to self's `Value` type.
-
+    ///     - localValue: The value passed to `validate` on the derived validator.
+    ///
     /// - Returns: A new validator that operates on `LocalValue`.
-    public func pullback<LocalValue>(_ transform: @escaping (LocalValue) -> Value) -> ValidatorOf<LocalValue, Error> {
+    ///
+    public func pullback<LocalValue>(_ transform: @escaping (_ localValue: LocalValue) -> Value) -> ValidatorOf<LocalValue, Error> {
         return ValidatorOf<LocalValue, Error> { localValue in
             self.validate(transform(localValue)).map { _ in localValue }
         }
@@ -119,6 +121,22 @@ public struct ValidatorOf<Value, Error> {
         }
     }
     
+    /// Returns a validator that is the logical inverse of self.
+    ///
+    /// If you have some validator that performs some kind of boolean logic, you can easily produce a negated version using this operator.
+    ///
+    /// Example:
+    ///
+    ///     let isTrue = ValidatorOf<Bool, String> {
+    ///         if $0 == true { return .valid(true) }
+    ///         return .error("must be true")
+    ///     }
+    ///
+    ///     let isFalse = isTrue.negated(withError: "must be false")
+    ///
+    /// - Parameters:
+    ///     - error: The error to use for the negated invalid case.
+    ///
     public func negated(withError error: Error) -> Self {
         Self {
             switch self.validate($0) {
@@ -130,24 +148,65 @@ public struct ValidatorOf<Value, Error> {
         }
     }
     
-    public func mapErrors<LocalError>(_ transform: @escaping (Error) -> LocalError) -> ValidatorOf<Value, LocalError> {
+    /// Returns a new validator whose errors are transformed by the provided closure.
+    ///
+    /// This operator can be used to modify or replace errors on an existing validator whilst not changing the actual validation logic itself.
+    ///
+    /// All validators that produce an invalid result will hold on to a non-empty array of errors although many will typically only have one error. In this case you can simply return a brand new error value from your `transform` closure and it will replace that single error.
+    ///
+    /// However, it is possible for a validator to hold more than one error, for instance, any validators that you have composed using `combine`. In this case, you should use this method to derive a new error from the existing one. If you need to replace all errors with a single error you should use `reduceErrors` instead.
+    ///
+    /// - Parameters:
+    ///     - transform: A closure that is called with each error in turn and should return a new local error.
+    ///     - error: The error from the original validator.
+    ///
+    /// - Returns: A new validator whose errors are automatically mapped.
+    ///
+    public func mapErrors<LocalError>(_ transform: @escaping (_ error: Error) -> LocalError) -> ValidatorOf<Value, LocalError> {
         return ValidatorOf<Value, LocalError> { value in
             self.validate(value).mapErrors(transform)
         }
     }
-    
+
+    /// Returns a new validator whose errors are reduced to a single error using the provided closure.
+    ///
+    /// This operator can be used to create a validator that may produce multiple errors and reduce them into a single error.
+    ///
+    /// This method can be usedful if you only want to produce a single error that you present to a user e.g. by joining them into a single sentence, or you could use this method to wrap the errors in some other container object.
+    ///
+    /// - Parameters:
+    ///     - initialValue: The initial value passed into the reducer.
+    ///     - reducer: A closure that receives the initialValue on the first call, then the accumulated value, and each error in turn. It should return a new value that will be passed into the reducer on the next call.
+    ///     - result: The accumulated error value
+    ///     - error: Each error from the original validator.
+    ///
     func reduceErrors<ReducedError>(
         _ initialValue: ReducedError,
-        reducer: @escaping (ReducedError, Error) -> ReducedError) -> ValidatorOf<Value, ReducedError> {
+        reducer: @escaping (_ result: ReducedError, _ error: Error) -> ReducedError) -> ValidatorOf<Value, ReducedError> {
         return ValidatorOf<Value, ReducedError> { value in
             self.validate(value).reduceErrors(initialValue, reducer)
         }
     }
     
+    /// Composes multiple validators into a single validator.
+    ///
+    /// This form takes a variadic list of validators/
+    ///
+    /// - See Also: `combine(validators:)`
+    ///
     public static func combine<Value, Error>(_ validators: ValidatorOf<Value, Error>...) -> ValidatorOf<Value, Error> {
         combine(validators)
     }
     
+    /// Composes an array of validators into a single validator.
+    ///
+    /// Returns a new validator that accumulates the results of each composed validator, returning a `.valid` result if all validators are valid or an `.invalid` result containing an aggregate of all errors if any of them are invalid.
+    ///
+    /// - Parameters:
+    ///     - validators: A homogenous collection of validators that operate on the same `Value` and `Error`.
+    ///
+    /// - Returns: A new composite validator.
+    ///
     public static func combine<Value, Error>(_ validators: [ValidatorOf<Value, Error>]) -> ValidatorOf<Value, Error> {
         return ValidatorOf<Value, Error> { value in
             validators.reduce(.valid(value)) { validated, validator in
@@ -158,6 +217,19 @@ public struct ValidatorOf<Value, Error> {
 }
 
 extension ValidatorOf where Error == String {
+    /// Returns a new optional validator that operates on `Value?` instead of `Value`.
+    ///
+    /// This operator allows you to re-use an existing validator on non-optional types with an optional of the same type.
+    ///
+    /// This operator is similar to `optional(errorOnNil:)` except instead of taking an error value, it simply takes a boolean to indicate whether nil is allowed. If `allowNil` is `true` then nil values will be treated as valid, otherwise they will be treated as invalid, using a default string error message.
+    ///
+    /// Whilst you could use `mapErrors` or `reduceErrors` to modify the default message, if you need to use a specific error you should use `optional(errorOnNil:)` and pass the required error directly.
+    ///
+    /// - Parameters:
+    ///     - errorOnNil: An optional error value. If an error value is given, `nil` values will be treated as invalid and the error value given will be used in the `.invalid` result. If no error value is given, `nil` values will always produce a `.valid` result.
+    ///
+    /// - See Also: `optional(errorOnNil:)`
+    ///
     public func optional(allowNil: Bool) -> ValidatorOf<Value?, Error> {
         ValidatorOf<Value?, Error> { optionalValue in
             if let value = optionalValue {
@@ -169,7 +241,20 @@ extension ValidatorOf where Error == String {
 }
 
 extension ValidatorOf {
-    static func its<T>(_ transform: @escaping (Value) -> T, _ validator: ValidatorOf<T, Error>) -> Self {
+    /// Syntatic sugar for pulling back a validator to a new type.
+    ///
+    /// Example:
+    ///
+    ///     let validateFirstItem: ValidatorOf<[Int], String> = .its(\.first, .isGreaterThan(0))
+    ///
+    /// - Parameters:
+    ///     - transform: A closure that derives a value `T` from another value.
+    ///     - value: The value to be transformed.
+    ///     - validator: The validator to pull back on.
+    ///
+    /// - Returns: A validator on type `T`.
+    ///
+    static func its<T>(_ transform: @escaping (_ value: Value) -> T, _ validator: ValidatorOf<T, Error>) -> Self {
         validator.pullback(transform)
     }
     
@@ -179,11 +264,29 @@ extension ValidatorOf {
      so to workaround it we can can provide overload that takes a key path explicitly.
     https://forums.swift.org/t/keypath-as-function-inside-property-wrapper-doesnt-compile-in-5-2-fine-in-5-3/38074
     */
+    /// A version of `its` that provides explicit support for a `KeyPath`.
+    ///
+    /// This provides keypath support for versions of Swift prior to 5.2 (which supports passing a `KeyPath` as a function directly).
+    ///
+    /// - See Also: `its(transform:, validator:)`
+    ///
     static func its<T>(_ keyPath: KeyPath<Value, T>, _ validator: ValidatorOf<T, Error>) -> Self {
         validator.pullback { $0[keyPath: keyPath] }
     }
     #endif
     
+    /// Syntatic sugar for the `negated()` operator.
+    ///
+    /// This allows for a more expressive definition of a negated validator, e.g.:
+    ///
+    ///     let notEqualTo: ValidatorOf<String, String> = .not(.equalTo("foo"), error: "must not equal foo").
+    ///
+    /// - Parameters:
+    ///     - validator: The validator to negate.
+    ///     - error: The error to use for invalid results on the negated validator.
+    ///
+    /// - See Also: `negated(withError:)`
+    ///
     static func not(_ validator: Self, error: Error) -> Self {
         return validator.negated(withError: error)
     }
