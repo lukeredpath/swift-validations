@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ValidatorOf Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/ValidatorOf" class="dashAnchor"></a>
+    <a title="ValidatorOf Structure Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Validations Docs</a> (26% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Validations Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        ValidatorOf Structure Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/OptionalValidating.html">OptionalValidating</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/Validating.html">Validating</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/ValidatorOf.html">ValidatorOf</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>ValidatorOf</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                </div>
+              </div>
+            <p>A type that acts as a generic wrapper around a validate function.</p>
+
+<p>This type is the building block for all validations provided by the library.</p>
+
+<p>When writing your own validators - either from scratch, or by composing existing ones - it is recommended that you encapsulate these by creating static variables (or functions, if your validator takes parameters) on extensions of <code>ValidatorOf</code>, constrainted to the type value type that the validator operates on.</p>
+
+<p>You should also constrain your extension on the particular type of error that you return - in most cases this will simply be a <code>String</code>.</p>
+
+<p>The following example shows you can define your own validator that operates on an <code>Int</code>:</p>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">ValidatorOf</span> <span class="k">where</span> <span class="kt">Value</span> <span class="o">==</span> <span class="kt">String</span><span class="p">,</span> <span class="kt">Error</span> <span class="o">==</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="kd">func</span> <span class="nf">myIntValidator</span><span class="p">(</span><span class="nv">someParameter</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="k">Self</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">Self</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span>
+            <span class="c1">// your validation logic</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Defining your validators in this way allows you to pass an instance into anything that takes a <code>ValidatorOf&lt;Int, String&gt;</code> (such as the <code><a href="../Structs/Validating.html">@Validating</a></code> property wrapper) in concise form by taking advantage of Swift type-inference, e.g.:</p>
+<pre class="highlight swift"><code><span class="kd">@Validating(.myIntValidator(someParameter: 1)</span><span class="p">)</span>
+</code></pre>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV0B0a"></a>
+                    <a name="//apple_ref/swift/Alias/Validator" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV0B0a">Validator</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A closure type that encapsulates validation logic.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">Validator</span> <span class="o">=</span> <span class="p">(</span><span class="n">_</span> <span class="nv">value</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Validated</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>value</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The value to be validated.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The validation result, either <code>.valid(Value)</code> or <code>.invalid(Error)</code>.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV8validatey9ValidatedAEOyxq_Gxcvp"></a>
+                    <a name="//apple_ref/swift/Property/validate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV8validatey9ValidatedAEOyxq_Gxcvp">validate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The validate function. Call this as a function to perform validation on a given  value.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">validate</span><span class="p">:</span> <span class="kt"><a href="../Structs/ValidatorOf.html#/s:11Validations11ValidatorOfV0B0a">Validator</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV8validateACyxq_G9ValidatedAFOyxq_Gxc_tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(validate:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV8validateACyxq_G9ValidatedAFOyxq_Gxc_tcfc">init(validate:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialises an instance with the given <code><a href="../Structs/ValidatorOf.html#/s:11Validations11ValidatorOfV0B0a">Validator</a></code> closure.</p>
+
+<p>Swift&rsquo;s trailing closure syntax allows for validator types to be defined quite succinctly:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">myIntValidator</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span>
+    <span class="c1">// your validation logic here</span>
+<span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">validate</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="kt"><a href="../Structs/ValidatorOf.html#/s:11Validations11ValidatorOfV0B0a">Validator</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>validate</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The validator function.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV8pullbackyACyqd__q_Gxqd__clF"></a>
+                    <a name="//apple_ref/swift/Method/pullback(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV8pullbackyACyqd__q_Gxqd__clF">pullback(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a new validator derived from self that operates on values of type <code>LocalValue</code>.</p>
+
+<p>Validator pullback allows you to re-use existing validator logic that works on one type <code>A</code> against a different type <code>B</code> by providing a  function that knows how to transform type <code>B</code> to <code>A</code>.</p>
+
+<p>For example, say you have an <code>ageValidator</code> that operates on type <code>Int</code>,  a <code>struct Person</code> that has an <code>age: Int</code> property and you want to define a <code>personValidator</code> that validates the person&rsquo;s age.</p>
+
+<p>Instead of writing a validator from scratch, you can simply use your existing <code>ageValidator</code>, pulled back to operate on type <code>Person</code>, providing a function that returns <code>Person.age</code>:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">personValidator</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Person</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">ageValidator</span><span class="o">.</span><span class="n">pullback</span> <span class="p">{</span> <span class="n">person</span> <span class="k">in</span> <span class="n">person</span><span class="o">.</span><span class="n">age</span> <span class="p">}</span>
+</code></pre>
+
+<p>Since Swift 5.2 allows you to pass a <code>KeyPath</code> as a function, the you can pass in any <code>KeyPath&lt;LocalValue, Value&gt;</code> instead:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">personValidator</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Person</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">ageValidator</span><span class="o">.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">pullback</span><span class="o">&lt;</span><span class="kt">LocalValue</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_</span> <span class="nv">transform</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">LocalValue</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">LocalValue</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>transform</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A function that converts some other type <code>LocalValue</code> to self&rsquo;s <code>Value</code> type.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A new validator that operates on <code>LocalValue</code>.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV8optional10errorOnNilACyxSgq_Gq_Sg_tF"></a>
+                    <a name="//apple_ref/swift/Method/optional(errorOnNil:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV8optional10errorOnNilACyxSgq_Gq_Sg_tF">optional(errorOnNil:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns a new optional validator that operates on <code>Value?</code> instead of <code>Value</code>.</p>
+
+<p>This operator allows you to re-use an existing validator on non-optional types with an optional of the same type.</p>
+
+<p>This can be useful in situations where you cannot rely on the Swift type system to enforce optional behaviour, for example if you are capturing some user input that you require be non-nil but cannot use a non-optional type as there is no sensible default that you can use.</p>
+
+<p>Whenever possible, if you have a value that is required and you are able to provide a sensible default you should prefer to use the Swift type system to enforce it and use a non-optional property and validator.</p>
+
+<p>This generic form takes an optional error value that will be used to determine if a value is required in order to be valid.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <p>See Also: <code><a href="../Structs/ValidatorOf.html#/s:11Validations11ValidatorOfVAASSRs_rlE8optional8allowNilACyxSgSSGSb_tF">optional(allowNil:)</a></code></p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">optional</span><span class="p">(</span><span class="nv">errorOnNil</span><span class="p">:</span> <span class="kt">Error</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">?,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>errorOnNil</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An optional error value. If an error value is given, <code>nil</code> values will be treated as invalid and the error value given will be used in the <code>.invalid</code> result. If no error value is given, <code>nil</code> values will always produce a <code>.valid</code> result.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV7negated9withErrorACyxq_Gq__tF"></a>
+                    <a name="//apple_ref/swift/Method/negated(withError:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV7negated9withErrorACyxq_Gq__tF">negated(withError:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">negated</span><span class="p">(</span><span class="n">withError</span> <span class="nv">error</span><span class="p">:</span> <span class="kt">Error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV9mapErrorsyACyxqd__Gqd__q_clF"></a>
+                    <a name="//apple_ref/swift/Method/mapErrors(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV9mapErrorsyACyxqd__Gqd__q_clF">mapErrors(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">mapErrors</span><span class="o">&lt;</span><span class="kt">LocalError</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_</span> <span class="nv">transform</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">LocalError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">LocalError</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV7combineyACyqd__qd_0_GAEd_tr0_lFZ"></a>
+                    <a name="//apple_ref/swift/Method/combine(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV7combineyACyqd__qd_0_GAEd_tr0_lFZ">combine(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="n">combine</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_</span> <span class="nv">validators</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfV7combineyACyqd__qd_0_GSayAEGr0_lFZ"></a>
+                    <a name="//apple_ref/swift/Method/combine(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfV7combineyACyqd__qd_0_GSayAEGr0_lFZ">combine(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="n">combine</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_</span> <span class="nv">validators</span><span class="p">:</span> <span class="p">[</span><span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%20%3D%3D%20%60Bool%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value` == `Bool`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%20%3D%3D%20%60Bool%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code> == <code>Bool</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASbRszSSRs_rlE6isTrueACySbSSGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isTrue" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASbRszSSRs_rlE6isTrueACySbSSGvpZ">isTrue</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isTrue</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASbRszSSRs_rlE7isFalseACySbSSGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isFalse" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASbRszSSRs_rlE7isFalseACySbSSGvpZ">isFalse</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isFalse</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Bool</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Collection%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Collection`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Collection%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Collection</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASlRzSSRs_rlE09hasLengthC0yACyxSSGACySiSSGFZ"></a>
+                    <a name="//apple_ref/swift/Method/hasLengthOf(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASlRzSSRs_rlE09hasLengthC0yACyxSSGACySiSSGFZ">hasLengthOf(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">hasLengthOf</span><span class="p">(</span><span class="n">_</span> <span class="nv">validator</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Collection%60%2C%20%60Value.Element%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Collection`, `Value.Element`: `Equatable`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Collection%60%2C%20%60Value.Element%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Collection</code>, <code>Value.Element</code>: <code>Equatable</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASlRzSSRs_SQ7ElementRpzrlE8containsyACyxSSGAEFZ"></a>
+                    <a name="//apple_ref/swift/Method/contains(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASlRzSSRs_SQ7ElementRpzrlE8containsyACyxSSGAEFZ">contains(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">contains</span><span class="p">(</span><span class="n">_</span> <span class="nv">element</span><span class="p">:</span> <span class="kt">Value</span><span class="o">.</span><span class="kt">Element</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Comparable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Comparable`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Comparable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Comparable</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isAtLeastyACyxSSGxFZ"></a>
+                    <a name="//apple_ref/swift/Method/isAtLeast(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isAtLeastyACyxSSGxFZ">isAtLeast(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isAtLeast</span><span class="p">(</span><span class="n">_</span> <span class="nv">minimum</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE8isAtMostyACyxSSGxFZ"></a>
+                    <a name="//apple_ref/swift/Method/isAtMost(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE8isAtMostyACyxSSGxFZ">isAtMost(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isAtMost</span><span class="p">(</span><span class="n">_</span> <span class="nv">maximum</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE10isLessThanyACyxSSGxFZ"></a>
+                    <a name="//apple_ref/swift/Method/isLessThan(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE10isLessThanyACyxSSGxFZ">isLessThan(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isLessThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">upperBound</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE13isGreaterThanyACyxSSGxFZ"></a>
+                    <a name="//apple_ref/swift/Method/isGreaterThan(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE13isGreaterThanyACyxSSGxFZ">isGreaterThan(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isGreaterThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isInRangeyACyxSSGSNyxGFZ"></a>
+                    <a name="//apple_ref/swift/Method/isInRange(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isInRangeyACyxSSGSNyxGFZ">isInRange(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isInRange</span><span class="p">(</span><span class="n">_</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">ClosedRange</span><span class="o">&lt;</span><span class="kt">Value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isInRangeyACyxSSGSnyxGFZ"></a>
+                    <a name="//apple_ref/swift/Method/isInRange(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASLRzSSRs_rlE9isInRangeyACyxSSGSnyxGFZ">isInRange(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isInRange</span><span class="p">(</span><span class="n">_</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">Value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Equatable`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Equatable</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASQRzSSRs_rlE10isIncluded2inACyxSSGSayxG_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/isIncluded(in:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASQRzSSRs_rlE10isIncluded2inACyxSSGSayxG_tFZ">isIncluded(in:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isIncluded</span><span class="p">(</span><span class="k">in</span> <span class="nv">collection</span><span class="p">:</span> <span class="p">[</span><span class="kt">Value</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASQRzSSRs_rlE10isExcluded4fromACyxSSGSayxG_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/isExcluded(from:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASQRzSSRs_rlE10isExcluded4fromACyxSSGSayxG_tFZ">isExcluded(from:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isExcluded</span><span class="p">(</span><span class="n">from</span> <span class="nv">collection</span><span class="p">:</span> <span class="p">[</span><span class="kt">Value</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Hashable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Hashable`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Hashable%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Hashable</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASHRzSSRs_rlE10isIncluded2inACyxSSGShyxG_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/isIncluded(in:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASHRzSSRs_rlE10isIncluded2inACyxSSGShyxG_tFZ">isIncluded(in:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isIncluded</span><span class="p">(</span><span class="k">in</span> <span class="nv">set</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">Value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASHRzSSRs_rlE10isExcluded4fromACyxSSGShyxG_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/isExcluded(from:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASHRzSSRs_rlE10isExcluded4fromACyxSSGShyxG_tFZ">isExcluded(from:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isExcluded</span><span class="p">(</span><span class="n">from</span> <span class="nv">set</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">Value</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%602"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value`: `Equatable`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%3A%20%60Equatable%60%2C%20%60Error%60%20%3D%3D%20%60String%602"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code>: <code>Equatable</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASQRzSSRs_rlE9isEqualToyACyxSSGxFZ"></a>
+                    <a name="//apple_ref/swift/Method/isEqualTo(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASQRzSSRs_rlE9isEqualToyACyxSSGxFZ">isEqualTo(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isEqualTo</span><span class="p">(</span><span class="n">_</span> <span class="nv">other</span><span class="p">:</span> <span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%20%3D%3D%20%60Int%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value` == `Int`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%20%3D%3D%20%60Int%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code> == <code>Int</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASiRszSSRs_rlE9isExactlyyACySiSSGSiFZ"></a>
+                    <a name="//apple_ref/swift/Method/isExactly(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASiRszSSRs_rlE9isExactlyyACySiSSGSiFZ">isExactly(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">isExactly</span><span class="p">(</span><span class="n">_</span> <span class="nv">amount</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASiRszSSRs_rlE6isEvenACySiSSGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isEven" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASiRszSSRs_rlE6isEvenACySiSSGvpZ">isEven</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isEven</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASiRszSSRs_rlE5isOddACySiSSGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isOdd" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASiRszSSRs_rlE5isOddACySiSSGvpZ">isOdd</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isOdd</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Value%60%20%3D%3D%20%60String%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Value` == `String`, `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Value%60%20%3D%3D%20%60String%60%2C%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Value</code> == <code>String</code>, <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE10beginsWithyACyS2SGSSFZ"></a>
+                    <a name="//apple_ref/swift/Method/beginsWith(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE10beginsWithyACyS2SGSSFZ">beginsWith(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">beginsWith</span><span class="p">(</span><span class="n">_</span> <span class="nv">prefix</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE8endsWithyACyS2SGSSFZ"></a>
+                    <a name="//apple_ref/swift/Method/endsWith(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE8endsWithyACyS2SGSSFZ">endsWith(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">endsWith</span><span class="p">(</span><span class="n">_</span> <span class="nv">suffix</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE9itsLengthyACyS2SGACySiSSGFZ"></a>
+                    <a name="//apple_ref/swift/Method/itsLength(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE9itsLengthyACyS2SGACySiSSGFZ">itsLength(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">itsLength</span><span class="p">(</span><span class="n">_</span> <span class="nv">validator</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE09hasLengthC0yACyS2SGSiFZ"></a>
+                    <a name="//apple_ref/swift/Method/hasLengthOf(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE09hasLengthC0yACyS2SGSiFZ">hasLengthOf(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">hasLengthOf</span><span class="p">(</span><span class="n">_</span> <span class="nv">length</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE14matchesPattern_2asACyS2SGSS_So22NSStringCompareOptionsVtFZ"></a>
+                    <a name="//apple_ref/swift/Method/matchesPattern(_:as:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE14matchesPattern_2asACyS2SGSS_So22NSStringCompareOptionsVtFZ">matchesPattern(_:<wbr>as:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">matchesPattern</span><span class="p">(</span>
+    <span class="n">_</span> <span class="nv">pattern</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+    <span class="k">as</span> <span class="nv">options</span><span class="p">:</span> <span class="kt">NSString</span><span class="o">.</span><span class="kt">CompareOptions</span> <span class="o">=</span> <span class="o">.</span><span class="n">regularExpression</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="k">Self</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE7isEmptyACyS2SGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isEmpty" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE7isEmptyACyS2SGvpZ">isEmpty</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isEmpty</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRszSSRs_rlE10isNotEmptyACyS2SGvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/isNotEmpty" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRszSSRs_rlE10isNotEmptyACyS2SGvpZ">isNotEmpty</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">isNotEmpty</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `Error` == `String`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Error%60%20%3D%3D%20%60String%60"></a>
+                  <h3 class="section-name"><p>Available where <code>Error</code> == <code>String</code></p>
+</h3>
+                </div>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11Validations11ValidatorOfVAASSRs_rlE8optional8allowNilACyxSgSSGSb_tF"></a>
+                    <a name="//apple_ref/swift/Method/optional(allowNil:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11Validations11ValidatorOfVAASSRs_rlE8optional8allowNilACyxSgSSGSb_tF">optional(allowNil:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">optional</span><span class="p">(</span><span class="nv">allowNil</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">?,</span> <span class="kt">Error</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2020-07-02)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

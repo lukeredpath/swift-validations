@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Validations  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="Validations  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Validations Docs</a> (26% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Validations Reference</a>
+        <img id="carat" src="img/carat.png" />
+        Validations  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/OptionalValidating.html">OptionalValidating</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Validating.html">Validating</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/ValidatorOf.html">ValidatorOf</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='validations' class='heading'>Validations</h1>
+
+<p><img src="https://github.com/lukeredpath/swift-validations/workflows/Swift/badge.svg" alt="Swift"></p>
+<h2 id='overview' class='heading'>Overview</h2>
+
+<p>Validations is a high-level validation library, written in a functional style. It was created to explore functional API design as outlined in the <a href="https://www.pointfree.co/collections/protocol-witnesses">Pointfree.co series on protocol witnesses</a> as an alternative to the usual protocol-oriented approach. </p>
+
+<p>The library builds on top of the <code>Validated</code> type provided by the <a href="https://github.com/pointfreeco/swift-validated">Validated</a> library.</p>
+<h2 id='core-api' class='heading'>Core API</h2>
+
+<p>Fundamentally, a validator can be expressed as a generic function of type:</p>
+<pre class="highlight swift"><code><span class="p">(</span><span class="kt">Value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Validated</span><span class="o">&lt;</span><span class="kt">Value</span><span class="p">,</span> <span class="kt">ErrorType</span><span class="o">&gt;</span>
+</code></pre>
+
+<p>The <code>Validated</code> type is an enum that represents either a valid value or an invalid value. An invalid value has a non-empty collection of errors of type <code>ErrorType</code>.</p>
+
+<p>Validations wrapps the above method up in a struct type called <code>ValidatorOf&lt;T, ErrorType&gt;</code> where <code>T</code> is the the of value being validated. Therefore, any custom validator can be expressed as such:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">alwaysValid</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Any</span><span class="p">,</span> <span class="kt">Never</span><span class="o">&gt;</span> <span class="p">{</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="kt">XCTAssert</span><span class="p">(</span><span class="n">alwaysValid</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+<span class="kt">XCTAssert</span><span class="p">(</span><span class="n">alwaysValid</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="s">"foo"</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+
+<span class="k">let</span> <span class="nv">alwaysFails</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Any</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="kt">XCTAssertFalse</span><span class="p">(</span><span class="n">alwaysFails</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+<span class="kt">XCTAssertEquals</span><span class="p">(</span><span class="s">"failed"</span><span class="p">,</span> <span class="n">alwaysFails</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">errors</span><span class="p">?</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
+</code></pre>
+<h3 id='re-using-existing-validators' class='heading'>Re-using existing validators</h3>
+
+<p>Validators be extended and re-used with other types by using the <code>pullback</code> function. For example, given we already have a <code>greaterThan</code> validator that works on <code>Int</code>:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">greaterThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span> 
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">lowerBound</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"is not greater than </span><span class="se">\(</span><span class="n">lowerBound</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>If we wanted to write a similar validator for the length of a string, we could write one from scratch:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span> 
+    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">lowerBound</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"length is not greater than </span><span class="se">\(</span><span class="n">lowerBound</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>However, we are effectively duplicating the logic of the <code>greaterThan</code> validator - the only thing that changes is how we obtain the value to compare against (<code>value.count</code> instead of <code>value</code>) and the error message is prefixed with &ldquo;length &rdquo;.</p>
+
+<p>We can remove the logic duplication by pulling back the <code>greaterThan</code> validator to operate on the <code>value</code>&lsquo;s <code>count</code>:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="n">pullback</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>As of Swift 5.2, we can shorten this further due to support for passing a keypath as a function parameter:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Finally, we can improve the error message to add back the &ldquo;length &rdquo; prefix by using <code>mapError</code>:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span>
+      <span class="o">.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">mapError</span> <span class="p">{</span> <span class="s">"length </span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='combining-validators' class='heading'>Combining validators</h3>
+
+<p>Higher-level validators can be formed from existing ones using the <code>.combine</code> static method, so long as the operate on the same value type:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">lowerAgeLimit</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">greaterThan</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">upperAgeLimit</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">lessThan</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">ageValidator</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">combine</span><span class="p">(</span><span class="n">lowerAgeLimit</span><span class="p">,</span> <span class="n">upperAgeLimit</span><span class="p">)</span>
+
+<span class="kt">XCTAssert</span><span class="p">(</span><span class="n">ageValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+<span class="kt">XCTAssertFalse</span><span class="p">(</span><span class="n">ageValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+<span class="kt">XCTAssertFalse</span><span class="p">(</span><span class="n">ageValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+</code></pre>
+<h3 id='negating-validators' class='heading'>Negating validators</h3>
+
+<p>A validator that operates as the logical inverse of an existing validator can be produced using the <code>negated()</code> method on <code><a href="Structs/ValidatorOf.html">ValidatorOf</a></code>.</p>
+
+<p>For example, given a validator that checks for odd numbers:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">isOdd</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> 
+    <span class="k">if</span> <span class="nv">$0</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span> 
+        <span class="k">return</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"is not odd"")
+}
+</span></code></pre>
+
+<p>You could create a validator that checks for even numbers by negating it. When negating a matcher, a new error message should be provided for the negated error case.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">isEven</span> <span class="o">=</span> <span class="n">isOdd</span><span class="o">.</span><span class="nf">negated</span><span class="p">(</span><span class="nv">withError</span><span class="p">:</span> <span class="s">"is not even"</span><span class="p">)</span>
+</code></pre>
+
+<p>A static function <code>.not</code> is provided as syntatic sugar. The above could be re-written as:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">isEven</span><span class="p">:</span> <span class="kt">Validator</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="o">.</span><span class="nf">not</span><span class="p">(</span><span class="n">isOdd</span><span class="p">)</span>
+</code></pre>
+<h3 id='handling-optional-values' class='heading'>Handling optional values</h3>
+
+<p>It is possible to create a validator over an optional value, expressed as a type <code>ValidatorOf&lt;T?, Error&gt;</code> - when doing so, it is up to you to define how to handle nil values. If a value is optional, you can permit nil values by returning a <code>.valid</code> result - if a value is required then you should return an invalid result with an appropriate error message. </p>
+
+<p>For example, a validator on an optional <code>Int</code> that allows nil values can be defined as:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">optionalInt</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">?,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">optionalValue</span> <span class="k">in</span>
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="n">optionalValue</span> <span class="p">{</span>
+        <span class="c1">// your validation logic here</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="n">optionalValue</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Alternatively, if you always require a value in order for the validator to return a valid result, you could instead write the following:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">optionalInt</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">?,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">optionalValue</span> <span class="k">in</span>
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="n">optionalValue</span> <span class="p">{</span>
+        <span class="c1">// your validation logic here</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"is required"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Validators that operate on optional types will return a <code>Validated&lt;T?, Error&gt;</code> result type.</p>
+
+<p>The library provides an <code>optional()</code> operator in two different forms that can be used to convert an existing validator that operates on a non-optional type to one that operates on an optional - in both cases you are required to specify how missing values should be handled.</p>
+
+<p>The generic overload requires that you pass in an optional error value of type <code>Error?</code> - if an error value is given then nil values will be treated as an error and will return an invalid result using the error value you give it. If no error value is given, then nil values will be treated as valid:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">ageMustBeOverTen</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="o">...</span>
+<span class="k">let</span> <span class="nv">optionalAgeValidator</span> <span class="o">=</span> <span class="n">ageMustBeOverTen</span><span class="o">.</span><span class="nf">optional</span><span class="p">(</span><span class="nv">errorOnNil</span><span class="p">:</span> <span class="s">"is required"</span><span class="p">)</span>
+
+<span class="n">optionalAgeValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>   <span class="c1">// returns Validated&lt;Int?, String&gt;.valid</span>
+<span class="n">optionalAgeValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>   <span class="c1">// returns Validated&lt;Int?, String&gt;.error("must be over 10")</span>
+<span class="n">optionalAgeValidator</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>  <span class="c1">// returns Validated&lt;Int?, String&gt;.error("is required")</span>
+</code></pre>
+
+<p>All of the built-in validators and most of the validators you write yourself will use a <code>String</code> error type - in this case, you can use the alternative form <code>optional(allowNil: Bool)</code>, simply specifying if nil values are allowed or not - if you pass <code>false</code> then a default value of &ldquo;is required&rdquo; will be used:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">v1</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">hasPrefix</span><span class="p">(</span><span class="s">"foo"</span><span class="p">)</span><span class="o">.</span><span class="nf">optional</span><span class="p">(</span><span class="nv">allowNil</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+<span class="n">v1</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>    <span class="c1">// returns Validated&lt;String?, String&gt;.valid</span>
+
+<span class="k">let</span> <span class="nv">v2</span> <span class="o">=</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">hasPrefix</span><span class="p">(</span><span class="s">"foo"</span><span class="p">)</span><span class="o">.</span><span class="nf">optional</span><span class="p">(</span><span class="nv">allowNil</span><span class="p">:</span> <span class="kc">false</span><span class="p">)</span>
+<span class="n">v2</span><span class="o">.</span><span class="nf">validate</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>    <span class="c1">// returns Validated&lt;String?, String&gt;.error("is required")</span>
+</code></pre>
+<h3 id='built-in-validators' class='heading'>Built-in validators</h3>
+
+<p>The following validators are built-in and can be combined to form more domain-specific validations in your code:</p>
+
+<ul>
+<li>Boolean
+
+<ul>
+<li><code>isTrue</code></li>
+<li><code>isFalse</code></li>
+</ul></li>
+<li>Collection
+
+<ul>
+<li><code>hasLengthOf</code></li>
+<li><code>contains</code> (where <code>Collection&lt;T: Equatable&gt;</code>)</li>
+</ul></li>
+<li>Comparable
+
+<ul>
+<li><code>isAtLeast</code></li>
+<li><code>isAtMost</code></li>
+<li><code>isLessThan</code></li>
+<li><code>isGreaterThan</code></li>
+<li><code>isInRange(x...y)</code></li>
+<li><code>isInRange(x..&lt;y)</code></li>
+</ul></li>
+<li>Collection Membership
+
+<ul>
+<li><code>isIncluded(in: Array)</code></li>
+<li><code>isExcluded(from: Array)</code></li>
+<li><code>isIncluded(in: Set)</code></li>
+<li><code>isExcluded(from: Set)</code></li>
+</ul></li>
+<li>Equatable
+
+<ul>
+<li><code>isEqualTo</code></li>
+</ul></li>
+<li>Numeric
+
+<ul>
+<li><code>isExactly</code></li>
+<li><code>isOdd</code></li>
+<li><code>isEven</code></li>
+</ul></li>
+<li>String
+
+<ul>
+<li><code>itsLength(&lt;numeric validator type&gt;)</code></li>
+<li><code>hasLengthOf</code></li>
+<li><code>beginsWith</code></li>
+<li><code>endsWith</code></li>
+<li><code>matchesPattern(_, as:)</code> (defaults to <code>.regularExpression</code>)</li>
+</ul></li>
+</ul>
+<h2 id='validating-and-validating' class='heading'>Validating and @Validating</h2>
+
+<p>The library ships with a <code><a href="Structs/Validating.html">Validating</a></code> type which can be used either on it&rsquo;s own or as a property wrapper. The <code><a href="Structs/Validating.html">Validating&lt;Value&gt;</a></code> wraps both a value of type <code>Value</code> and a <code>ValidatorOf&lt;Value, String&gt;</code> that re-validates every time <code>Value</code> is updated, producing a new <code>Validated&lt;Value&gt;</code> which is stored internally. </p>
+
+<p>The <code><a href="Structs/Validating.html">Validating</a></code> type provides dynamic property access to the underlying <code>Validated&lt;Value&gt;</code> so you can check if it is valid or access any errors.</p>
+<h3 id='simple-usage' class='heading'>Simple usage</h3>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">validator</span><span class="p">:</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="o">.</span><span class="nf">combine</span><span class="p">(</span>
+    <span class="o">.</span><span class="nf">hasPrefix</span><span class="p">(</span><span class="s">"foo"</span><span class="p">),</span> 
+    <span class="o">.</span><span class="nf">hasLengthOf</span><span class="p">(</span><span class="o">.</span><span class="nf">atLeast</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="k">var</span> <span class="nv">validatingString</span><span class="p">:</span> <span class="kt">Validating</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="kt">Validating</span><span class="p">(</span><span class="nv">wrappedValue</span><span class="p">:</span> <span class="s">""</span><span class="p">,</span> <span class="nv">validator</span><span class="p">:</span> <span class="n">validator</span><span class="p">)</span>
+
+<span class="kt">XCTAssertEqual</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="n">validatingString</span><span class="o">.</span><span class="n">wrappedValue</span><span class="p">)</span>
+<span class="kt">XCTAssertFalse</span><span class="p">(</span><span class="n">validatingString</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+
+<span class="n">validatingString</span><span class="o">.</span><span class="n">wrappedValue</span> <span class="o">=</span> <span class="s">"foobar"</span>
+<span class="kt">XCTAssert</span><span class="p">(</span><span class="n">validatingString</span><span class="o">.</span><span class="n">isValid</span><span class="p">)</span>
+</code></pre>
+<h3 id='property-wrapper-usage' class='heading'>Property wrapper usage</h3>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">FormViewModel</span> <span class="p">{</span>
+    <span class="kd">@Validating(
+        .hasLengthOf(.atLeast(3)</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">var</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span>
+
+    <span class="kd">@Validating(
+        .isInRange(13...80)</span>
+    <span class="p">)</span>
+    <span class="k">var</span> <span class="nv">age</span><span class="p">:</span> <span class="kt">Int</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>When used as a property wrapper, you can use the <code>$var</code> syntax to access the <code>Validated&lt;Value&gt;</code> directly to check if they are valid. Using the <code>zip</code> function provided by the <code>Validated</code> library, you could implement an <code>isValid()</code> method for the entire view model:</p>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">FormViewModel</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">isValid</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span>
+        <span class="nf">zip</span><span class="p">(</span><span class="err">$</span><span class="n">name</span><span class="p">,</span> <span class="err">$</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="n">isValid</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='optional-values' class='heading'>Optional values</h3>
+
+<p>Whilst the Swift type system allows you to express whether or not a value is required using optional or non-optional values, there are times when you may have a required value but not have a sensible default value that you can set to satisfy the compiler - this is often the case when you have some kind of value that represents user input. In this case, it is preferable to make the value optional and then use a validation to enforce that it is non-nil.</p>
+
+<p>If you need to handle optional values, you can use the optional counterpart  <code><a href="Structs/OptionalValidating.html">OptionalValidating</a></code>. Like <code><a href="Structs/Validating.html">Validating</a></code> this can be used standalone or as a property-wrapper. You do not need to pass in validators on optional types as they are converted to optional forms automatically. </p>
+
+<p><code><a href="Structs/OptionalValidating.html">OptionalValidating</a></code> can be initialized with or without an initial value. When initialised with a default value, it will treat nil values as invalid by default - this can be changed by explicitly passing in the <code>required</code> parameter. When initialised without a default value, you must explicitly state whether the value is required or not.</p>
+
+<p>The following example demonstrates various uses as a property wrapper:</p>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">FormViewModel</span> <span class="p">{</span>
+    <span class="c1">// no default value means it is implicitly required and will start as invalid</span>
+    <span class="kd">@OptionalValidating(.greaterThan(10)</span><span class="p">)</span>
+    <span class="k">var</span> <span class="nv">requiredAge</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span>
+
+    <span class="c1">// if you can specify a default value, but still require it be non-nil you can be explicit</span>
+    <span class="kd">@OptionalValidating(required: true, .myPostcodeValidator)</span>
+    <span class="k">var</span> <span class="nv">postcode</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="s">""</span>
+
+    <span class="c1">// you can make a field truly optional by explicitly stating that it is not required</span>
+    <span class="kd">@OptionalValidating(required: false, .myPhoneNumberValidator)</span>
+    <span class="k">var</span> <span class="nv">phoneNumber</span><span class="p">:</span> <span class="kt">String</span>
+<span class="p">}</span>
+</code></pre>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2020-07-02)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
