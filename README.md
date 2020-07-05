@@ -68,7 +68,7 @@ We can remove the logic duplication by pulling back the `greaterThan` validator 
 
 ```swift
 func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return longerThan(lowerBound).pullback { $0.count }
+    return greaterThan(lowerBound).pullback { $0.count }
 }
 ```
 
@@ -76,7 +76,7 @@ As of Swift 5.2, we can shorten this further due to support for passing a keypat
 
 ```swift
 func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return longerThan(lowerBound).pullback(\.count)
+    return greaterThan(lowerBound).pullback(\.count)
 }
 ```
 
@@ -84,7 +84,7 @@ Finally, we can improve the error message to add back the "length " prefix by us
 
 ```swift
 func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return longerThan(lowerBound)
+    return greaterThan(lowerBound)
       .pullback(\.count)
       .mapError { "length \($0)" }
 }
