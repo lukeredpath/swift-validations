@@ -52,7 +52,7 @@ func greaterThan(_ lowerBound: Int) -> ValidatorOf<Int, String> {
 If we wanted to write a similar validator for the length of a string, we could write one from scratch:
 
 ```swift
-func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
     return ValidatorOf<Int, String> { value in 
         if value.count > lowerBound {
             return .valid(value)
@@ -67,25 +67,24 @@ However, we are effectively duplicating the logic of the `greaterThan` validator
 We can remove the logic duplication by pulling back the `greaterThan` validator to operate on the `value`'s `count`:
 
 ```swift
-func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return ValidatorOf<Int, String>.longerThan(lowerBound).pullback { $0.count }
+func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return longerThan(lowerBound).pullback { $0.count }
 }
 ```
 
 As of Swift 5.2, we can shorten this further due to support for passing a keypath as a function parameter:
 
 ```swift
-func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return ValidatorOf<Int, String>.longerThan(lowerBound).pullback(\.count)
+func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return longerThan(lowerBound).pullback(\.count)
 }
 ```
 
 Finally, we can improve the error message to add back the "length " prefix by using `mapError`:
 
 ```swift
-func longerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
-    return ValidatorOf<Int, String>
-      .longerThan(lowerBound)
+func lengthLongerThan(_ lowerBound: Int) -> ValidatorOf<String, String> {
+    return longerThan(lowerBound)
       .pullback(\.count)
       .mapError { "length \($0)" }
 }
