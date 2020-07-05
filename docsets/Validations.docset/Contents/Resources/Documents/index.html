@@ -109,7 +109,7 @@
 <p>If we wanted to write a similar validator for the length of a string, we could write one from scratch:</p>
 <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span> <span class="n">value</span> <span class="k">in</span> 
-    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">lowerBound</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="n">lowerBound</span> <span class="p">{</span>
             <span class="k">return</span> <span class="o">.</span><span class="nf">valid</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="o">.</span><span class="nf">error</span><span class="p">(</span><span class="s">"length is not greater than </span><span class="se">\(</span><span class="n">lowerBound</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
@@ -121,19 +121,20 @@
 
 <p>We can remove the logic duplication by pulling back the <code>greaterThan</code> validator to operate on the <code>value</code>&lsquo;s <code>count</code>:</p>
 <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="n">pullback</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">longerThan</span><span class="p">(</span><span class="n">lowerBound</span><span class="p">)</span><span class="o">.</span><span class="n">pullback</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">count</span> <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
 <p>As of Swift 5.2, we can shorten this further due to support for passing a keypath as a function parameter:</p>
 <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;.</span><span class="nf">longerThan</span><span class="p">(</span><span class="n">lowerBound</span><span class="p">)</span><span class="o">.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre>
 
 <p>Finally, we can improve the error message to add back the &ldquo;length &rdquo; prefix by using <code>mapError</code>:</p>
 <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">longerThan</span><span class="p">(</span><span class="n">_</span> <span class="nv">lowerBound</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kt">ValidatorOf</span><span class="o">&lt;</span><span class="kt">Int</span><span class="p">,</span> <span class="kt">String</span><span class="o">&gt;</span>
+      <span class="o">.</span><span class="nf">longerThan</span><span class="p">(</span><span class="n">lowerBound</span><span class="p">)</span>
       <span class="o">.</span><span class="nf">pullback</span><span class="p">(</span><span class="err">\</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
       <span class="o">.</span><span class="n">mapError</span> <span class="p">{</span> <span class="s">"length </span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>
 <span class="p">}</span>
@@ -339,7 +340,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2020 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2020-07-02)</p>
+      <p>&copy; 2020 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2020-07-05)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
