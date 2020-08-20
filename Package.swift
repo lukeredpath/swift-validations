@@ -12,12 +12,11 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "Validated", url: "https://github.com/pointfreeco/swift-validated.git", from: "0.2.1"),
-        .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty.git", from: "0.2.1")
     ],
     targets: [
         .target(
             name: "Validations",
-            dependencies: ["Validated", "NonEmpty"]),
+            dependencies: ["Validated"]),
         .testTarget(
             name: "ValidationsTests",
             dependencies: ["Validations"]),
